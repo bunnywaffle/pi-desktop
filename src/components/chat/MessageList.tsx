@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { PiMessage, ToolCall } from '../../types/pi';
 import { ToolCallItem } from './ToolCallItem';
 import { MarkdownRenderer } from './MarkdownRenderer';
-import { Copy, Check, ChevronDown, ChevronRight, Brain, User, Bot, AlertCircle, Edit3, RotateCcw } from 'lucide-react';
+import { Copy, Check, ChevronDown, ChevronRight, Brain, User, Bot, AlertCircle, Edit3, RotateCcw, ArrowDown } from 'lucide-react';
 
 interface MessageListProps {
   messages: PiMessage[];
@@ -23,39 +23,89 @@ export const MessageList: React.FC<MessageListProps> = ({
   onEditPrompt,
   onRevertPrompt
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const [showScrollBottom, setShowScrollBottom] = useState(false);
+  const isNearBottomRef = useRef(true);
+
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    bottomRef.current?.scrollIntoView({ behavior });
+  }, []);
+
+  const handleScroll = () => {
+    if (!containerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+    const distance = scrollHeight - scrollTop - clientHeight;
+    const near = distance < 100;
+    isNearBottomRef.current = near;
+    setShowScrollBottom(distance > 120);
+  };
+
+  // Auto-scroll when new messages or streaming chunks arrive, if user is near bottom
+  useEffect(() => {
+    if (isNearBottomRef.current) {
+      scrollToBottom(isStreaming ? 'auto' : 'smooth');
+    }
+  }, [messages, streamingText, streamingThinking, streamingToolCalls, isStreaming, scrollToBottom]);
+
   return (
-    <div className="flex-1 overflow-y-auto p-4 max-w-3xl w-full mx-auto space-y-6">
-      {messages.map((msg, index) => (
-        <MessageItem
-          key={index}
-          index={index}
-          message={msg}
-          onEditPrompt={onEditPrompt}
-          onRevertPrompt={onRevertPrompt}
-        />
-      ))}
+    <div className="relative flex-1 min-h-0 flex flex-col">
+      <div
+        ref={containerRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto p-4 max-w-3xl w-full mx-auto space-y-6 select-text"
+      >
+        {messages.map((msg, index) => (
+          <MessageItem
+            key={index}
+            index={index}
+            message={msg}
+            onEditPrompt={onEditPrompt}
+            onRevertPrompt={onRevertPrompt}
+          />
+        ))}
 
-      {/* Live Streaming Turn */}
-      {isStreaming && (
-        <div className="space-y-3">
-          {streamingThinking && (
-            <ThinkingBlock thinking={streamingThinking} isStreaming={true} />
-          )}
+        {/* Live Streaming Turn */}
+        {isStreaming && (
+          <div className="space-y-3">
+            {streamingThinking && (
+              <ThinkingBlock thinking={streamingThinking} isStreaming={true} />
+            )}
 
-          {streamingToolCalls.map((tc, idx) => (
-            <ToolCallItem key={idx} toolCall={tc} isStreaming={true} />
-          ))}
+            {streamingToolCalls.map((tc, idx) => (
+              <ToolCallItem key={idx} toolCall={tc} isStreaming={true} />
+            ))}
 
-          {streamingText && (
-            <div className="flex gap-3 text-sm">
-              <div className="w-7 h-7 rounded-lg bg-pi-accent/20 border border-pi-accent/40 flex items-center justify-center text-pi-accent flex-shrink-0 mt-0.5">
-                <Bot size={15} />
+            {streamingText && (
+              <div className="flex gap-3 text-sm">
+                <div className="w-7 h-7 rounded-lg bg-pi-accent/20 border border-pi-accent/40 flex items-center justify-center text-pi-accent flex-shrink-0 mt-0.5">
+                  <Bot size={15} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <MarkdownRenderer content={streamingText} isStreaming={true} />
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <MarkdownRenderer content={streamingText} isStreaming={true} />
-              </div>
-            </div>
-          )}
+            )}
+          </div>
+        )}
+
+        <div ref={bottomRef} className="h-2" />
+      </div>
+
+      {/* Floating Scroll to Latest Button */}
+      {showScrollBottom && (
+        <div className="absolute bottom-3 left-0 right-0 flex justify-center pointer-events-none z-20">
+          <button
+            onClick={() => scrollToBottom('smooth')}
+            className="pointer-events-auto flex items-center gap-1.5 px-3.5 py-1.5 bg-dark-800/95 hover:bg-dark-750 text-dark-200 hover:text-white rounded-full border border-dark-700/90 shadow-2xl transition-all text-xs font-medium backdrop-blur-md animate-in fade-in zoom-in-95 group cursor-pointer"
+            title="Scroll down to latest message"
+          >
+            <ArrowDown size={13} className="text-pi-accent group-hover:translate-y-0.5 transition-transform" />
+            <span>Latest messages</span>
+            {isStreaming && (
+              <span className="w-2 h-2 rounded-full bg-pi-accent animate-ping ml-0.5" />
+            )}
+          </button>
         </div>
       )}
     </div>

@@ -1,6 +1,6 @@
 {
   "name": "pi-desktop",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "type": "module",
   "description": "Modern desktop GUI and control layer for Pi coding agent",
   "main": "dist-electron/main.js",

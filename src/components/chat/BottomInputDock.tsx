@@ -27,62 +27,106 @@ interface BottomInputDockProps {
 }
 
 export interface ResolvedModelInfo {
+  providerKey: string;
   providerName: string;
   providerBadgeClass: string;
   displayTitle: string;
   isFree: boolean;
 }
 
-export function getModelProviderInfo(model: { id: string; name?: string; provider?: string }): ResolvedModelInfo {
-  const rawProvider = (model.provider || '').toLowerCase().trim();
-  const id = (model.id || '').toLowerCase().trim();
-  const isFree = id.includes(':free') || rawProvider.includes('free');
+export function formatProviderName(providerKey: string): string {
+  const p = (providerKey || '').toLowerCase().trim();
+  if (p === 'openrouter') return 'OpenRouter';
+  if (p === 'anthropic') return 'Anthropic';
+  if (p === 'openai') return 'OpenAI';
+  if (p === 'google') return 'Google';
+  if (p === 'groq') return 'Groq';
+  if (p === 'deepseek') return 'DeepSeek';
+  if (p === 'ollama') return 'Ollama';
+  if (p === 'cerebras') return 'Cerebras';
+  if (p === 'bansos') return 'Bansos';
+  if (p === 'agentrouter') return 'AgentRouter';
+  if (p === 'agentrouter-anthropic') return 'AgentRouter (Anthropic)';
+  if (p === 'mistral' || p === 'mistralai') return 'Mistral';
+  if (p === 'together' || p === 'togetherai') return 'Together AI';
+  if (p === 'cohere') return 'Cohere';
+  if (p === 'x-ai' || p === 'xai') return 'xAI';
+  if (p === 'default') return 'Default';
 
-  let providerName = '';
-  let providerBadgeClass = 'bg-dark-800 text-dark-300 border-dark-700';
+  return p
+    .split(/[-_]/)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
 
-  if (rawProvider.includes('openrouter') || id.startsWith('openrouter/')) {
-    providerName = 'OpenRouter';
-    providerBadgeClass = 'bg-indigo-500/20 text-indigo-300 border-indigo-500/35';
-  } else if (rawProvider.includes('anthropic') || id.startsWith('claude') || id.startsWith('anthropic/')) {
-    providerName = 'Anthropic';
-    providerBadgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/35';
-  } else if (rawProvider.includes('openai') || id.startsWith('gpt') || id.startsWith('o1') || id.startsWith('o3') || id.startsWith('openai/')) {
-    providerName = 'OpenAI';
-    providerBadgeClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/35';
-  } else if (rawProvider.includes('google') || id.startsWith('gemini') || id.startsWith('google/')) {
-    providerName = 'Google';
-    providerBadgeClass = 'bg-blue-500/20 text-blue-300 border-blue-500/35';
-  } else if (rawProvider.includes('groq') || id.startsWith('groq/')) {
-    providerName = 'Groq';
-    providerBadgeClass = 'bg-orange-500/20 text-orange-300 border-orange-500/35';
-  } else if (rawProvider.includes('deepseek') || id.startsWith('deepseek/')) {
-    providerName = 'DeepSeek';
-    providerBadgeClass = 'bg-cyan-500/20 text-cyan-300 border-cyan-500/35';
-  } else if (rawProvider.includes('ollama') || id.startsWith('ollama/')) {
-    providerName = 'Ollama (Local)';
-    providerBadgeClass = 'bg-pink-500/20 text-pink-300 border-pink-500/35';
-  } else if (rawProvider.includes('cerebras') || id.startsWith('cerebras/')) {
-    providerName = 'Cerebras';
-    providerBadgeClass = 'bg-rose-500/20 text-rose-300 border-rose-500/35';
-  } else if (rawProvider.includes('bansos')) {
-    providerName = 'Bansos';
-    providerBadgeClass = 'bg-teal-500/20 text-teal-300 border-teal-500/35';
-  } else if (rawProvider) {
-    providerName = model.provider ? (model.provider.charAt(0).toUpperCase() + model.provider.slice(1)) : 'Custom';
-    providerBadgeClass = 'bg-purple-500/20 text-purple-300 border-purple-500/35';
-  } else if (id.includes('/')) {
-    const prefix = id.split('/')[0];
-    providerName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
-    providerBadgeClass = 'bg-purple-500/20 text-purple-300 border-purple-500/35';
-  } else {
-    providerName = 'Default';
-    providerBadgeClass = 'bg-dark-800 text-dark-400 border-dark-700';
+export function getProviderBadgeClass(providerKey: string): string {
+  const p = (providerKey || '').toLowerCase().trim();
+  if (p === 'openrouter') return 'bg-indigo-500/20 text-indigo-300 border-indigo-500/35';
+  if (p === 'anthropic') return 'bg-amber-500/20 text-amber-300 border-amber-500/35';
+  if (p === 'openai') return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/35';
+  if (p === 'google') return 'bg-blue-500/20 text-blue-300 border-blue-500/35';
+  if (p === 'groq') return 'bg-orange-500/20 text-orange-300 border-orange-500/35';
+  if (p === 'deepseek') return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/35';
+  if (p === 'ollama') return 'bg-pink-500/20 text-pink-300 border-pink-500/35';
+  if (p === 'cerebras') return 'bg-rose-500/20 text-rose-300 border-rose-500/35';
+  if (p === 'bansos') return 'bg-teal-500/20 text-teal-300 border-teal-500/35';
+  if (p.startsWith('agentrouter')) return 'bg-violet-500/20 text-violet-300 border-violet-500/35';
+  return 'bg-purple-500/20 text-purple-300 border-purple-500/35';
+}
+
+export function getModelProviderInfo(
+  model: { id: string; name?: string; provider?: string },
+  modelCatalog?: PiModel[]
+): ResolvedModelInfo {
+  let rawProvider = (model.provider || '').trim();
+  const id = (model.id || '').trim();
+  const isFree = id.toLowerCase().includes(':free') || rawProvider.toLowerCase().includes('free');
+
+  // If provider wasn't passed directly, check catalog for exact model
+  if (!rawProvider && modelCatalog && modelCatalog.length > 0) {
+    const found = modelCatalog.find(m => m.id.toLowerCase() === id.toLowerCase());
+    if (found && found.provider) {
+      rawProvider = found.provider;
+    }
   }
 
-  const cleanDisplayTitle = model.name || (id.includes('/') ? id.split('/')[1] : id);
+  let providerKey = '';
+  // AUTHORITATIVE: If model specifies provider, ALWAYS respect it!
+  if (rawProvider) {
+    providerKey = rawProvider.toLowerCase().trim();
+  } else if (id.includes('/')) {
+    providerKey = id.split('/')[0].toLowerCase().trim();
+  } else if (id.toLowerCase().startsWith('claude')) {
+    providerKey = 'anthropic';
+  } else if (
+    id.toLowerCase().startsWith('gpt') ||
+    id.toLowerCase().startsWith('o1') ||
+    id.toLowerCase().startsWith('o3')
+  ) {
+    providerKey = 'openai';
+  } else if (id.toLowerCase().startsWith('gemini')) {
+    providerKey = 'google';
+  } else if (id.toLowerCase().startsWith('deepseek')) {
+    providerKey = 'deepseek';
+  } else {
+    providerKey = 'default';
+  }
+
+  const providerName = formatProviderName(providerKey);
+  const providerBadgeClass = getProviderBadgeClass(providerKey);
+
+  let cleanDisplayTitle = model.name;
+  if (!cleanDisplayTitle) {
+    if (id.includes('/')) {
+      const parts = id.split('/');
+      cleanDisplayTitle = parts.slice(1).join('/');
+    } else {
+      cleanDisplayTitle = id;
+    }
+  }
 
   return {
+    providerKey,
     providerName,
     providerBadgeClass,
     displayTitle: cleanDisplayTitle,
@@ -122,37 +166,66 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
   const effectiveModels = models && models.length > 0 ? models : fallbackModels;
 
   const dynamicProviders = useMemo(() => {
-    const provs = new Set<string>();
+    const provMap = new Map<string, { key: string; label: string; count: number }>();
+
     for (const m of effectiveModels) {
-      const info = getModelProviderInfo(m);
-      if (info.providerName && info.providerName !== 'Default') {
-        provs.add(info.providerName);
+      const info = getModelProviderInfo(m, effectiveModels);
+      if (info.providerKey) {
+        const existing = provMap.get(info.providerKey);
+        if (existing) {
+          existing.count++;
+        } else {
+          provMap.set(info.providerKey, {
+            key: info.providerKey,
+            label: info.providerName,
+            count: 1
+          });
+        }
       }
     }
-    return ['all', ...Array.from(provs).sort()];
+
+    const sorted = Array.from(provMap.values()).sort((a, b) => a.label.localeCompare(b.label));
+    return [
+      { key: 'all', label: 'All', count: effectiveModels.length },
+      ...sorted
+    ];
   }, [effectiveModels]);
 
-  // Filter models by query (matching id, name, and provider) and provider pill
-  const filteredModels = effectiveModels.filter(m => {
-    const info = getModelProviderInfo(m);
+  // Strict and accurate filter models by query & selected provider
+  const filteredModels = useMemo(() => {
     const q = modelSearchQuery.toLowerCase().trim();
 
-    const matchesProvider =
-      selectedProviderFilter === 'all' ||
-      info.providerName.toLowerCase().includes(selectedProviderFilter.toLowerCase());
+    return effectiveModels.filter(m => {
+      const info = getModelProviderInfo(m, effectiveModels);
 
-    if (!matchesProvider) return false;
-    if (!q) return true;
+      // Strict provider filter matching
+      if (selectedProviderFilter !== 'all') {
+        if (info.providerKey !== selectedProviderFilter) {
+          return false;
+        }
+      }
 
-    return (
-      m.id.toLowerCase().includes(q) ||
-      (m.name && m.name.toLowerCase().includes(q)) ||
-      info.providerName.toLowerCase().includes(q) ||
-      info.displayTitle.toLowerCase().includes(q) ||
-      (q === 'free' && info.isFree) ||
-      (q === 'thinking' && m.supportsThinking)
-    );
-  });
+      // Query search matching across id, name, provider, title, free, thinking
+      if (q) {
+        const matchesQuery =
+          m.id.toLowerCase().includes(q) ||
+          (m.name && m.name.toLowerCase().includes(q)) ||
+          info.providerName.toLowerCase().includes(q) ||
+          info.providerKey.toLowerCase().includes(q) ||
+          info.displayTitle.toLowerCase().includes(q) ||
+          (q === 'free' && info.isFree) ||
+          (q === 'thinking' && m.supportsThinking);
+
+        if (!matchesQuery) return false;
+      }
+
+      return true;
+    });
+  }, [effectiveModels, selectedProviderFilter, modelSearchQuery]);
+
+  const currentModelInfo = useMemo(() => {
+    return getModelProviderInfo({ id: selectedModel }, effectiveModels);
+  }, [selectedModel, effectiveModels]);
 
   // Close model picker on outside click
   useEffect(() => {
@@ -198,8 +271,6 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
     }
     setText('');
   };
-
-  const currentModelInfo = getModelProviderInfo({ id: selectedModel });
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 pb-4">
@@ -343,11 +414,16 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
                   <div className="flex items-center gap-1 overflow-x-auto pb-1.5 mb-1 text-[10px] no-scrollbar">
                     {dynamicProviders.map(p => (
                       <button
-                        key={p}
-                        onClick={() => setSelectedProviderFilter(p === 'all' ? 'all' : p)}
-                        className={`px-2 py-0.5 rounded font-medium whitespace-nowrap transition border ${selectedProviderFilter.toLowerCase() === p.toLowerCase() ? 'bg-pi-accent text-white border-pi-accent' : 'bg-dark-950 border-dark-800 text-dark-400 hover:text-white'}`}
+                        key={p.key}
+                        onClick={() => setSelectedProviderFilter(p.key)}
+                        className={`px-2 py-0.5 rounded font-medium whitespace-nowrap transition border ${
+                          selectedProviderFilter === p.key
+                            ? 'bg-pi-accent text-white border-pi-accent shadow-xs'
+                            : 'bg-dark-950 border-dark-800 text-dark-400 hover:text-white hover:border-dark-700'
+                        }`}
                       >
-                        {p === 'all' ? 'All' : p}
+                        <span>{p.label}</span>
+                        <span className="ml-1 opacity-60 text-[9px]">({p.count})</span>
                       </button>
                     ))}
                   </div>
@@ -357,7 +433,7 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
                     {filteredModels.length > 0 ? (
                       filteredModels.map(m => {
                         const isSelected = selectedModel === m.id;
-                        const info = getModelProviderInfo(m);
+                        const info = getModelProviderInfo(m, effectiveModels);
 
                         return (
                           <button
