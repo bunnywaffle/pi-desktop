@@ -104,6 +104,7 @@ export class SessionManager {
       let sessionName: string | undefined;
       let lastMessage: string | undefined;
       let model: string | undefined;
+      let thinkingLevel: string | undefined;
       let sessionCwd: string | undefined;
       let userCount = 0;
 
@@ -118,6 +119,12 @@ export class SessionManager {
           }
           if (obj.type === 'header') {
             if (obj.model) model = obj.model;
+          }
+          if (obj.type === 'model_change' && obj.modelId) {
+            model = obj.modelId;
+          }
+          if (obj.type === 'thinking_level_change' && obj.thinkingLevel) {
+            thinkingLevel = obj.thinkingLevel;
           }
           if (obj.type === 'message' && obj.message) {
             userCount++;
@@ -147,6 +154,7 @@ export class SessionManager {
         timestamp: stats.mtimeMs,
         lastMessage: lastMessage ? lastMessage.slice(0, 100) : undefined,
         model,
+        thinkingLevel,
         messageCount: userCount,
         cwd: sessionCwd
       };
