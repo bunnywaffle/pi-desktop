@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Settings, X, Save, Check, Shield, FileText, ToggleLeft, ToggleRight } from 'lucide-react';
 import { PiExtension } from '../../types/pi';
 
@@ -101,7 +101,7 @@ export const ExtensionOptionsModal: React.FC<ExtensionOptionsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in select-none">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
       <div className="bg-dark-900 border border-dark-700 rounded-xl shadow-2xl max-w-xl w-full flex flex-col max-h-[85vh] text-xs">
         {/* Header */}
         <div className="p-4 border-b border-dark-800 flex items-center justify-between">

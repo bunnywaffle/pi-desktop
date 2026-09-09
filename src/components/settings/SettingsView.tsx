@@ -511,7 +511,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ projectDir, onRefres
 
       {/* Add Custom Provider Modal */}
       {showCustomModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in select-none">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
           <div className="bg-dark-900 border border-dark-700 rounded-xl shadow-2xl max-w-lg w-full p-5 space-y-4 text-xs max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-2 border-b border-dark-800">
               <h3 className="text-sm font-semibold text-white flex items-center gap-2">

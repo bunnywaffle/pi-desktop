@@ -200,7 +200,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <div className="w-64 bg-dark-950 border-r border-dark-800/80 flex flex-col h-full select-none text-xs text-dark-300">
+    <div className="w-64 bg-dark-950 border-r border-dark-800/80 flex flex-col h-full text-xs text-dark-300">
       {/* Top New Chat button */}
       <div className="p-3 pb-2">
         <button
@@ -470,7 +470,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Rename Session Modal */}
       {renameSessionModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in select-none">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
           <div className="bg-dark-900 border border-dark-700 rounded-xl shadow-2xl max-w-sm w-full p-4 space-y-3 text-xs">
             <h3 className="font-semibold text-white text-sm flex items-center gap-2">
               <Edit2 size={14} className="text-amber-400" />

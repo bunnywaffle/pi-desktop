@@ -112,7 +112,7 @@ export const SkillManagerView: React.FC<SkillManagerProps> = ({ projectDir, onRe
       {/* Main split view */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Skills Explorer */}
-        <div className="w-72 border-r border-dark-800 overflow-y-auto p-4 space-y-4 select-none">
+        <div className="w-72 border-r border-dark-800 overflow-y-auto p-4 space-y-4">
           {/* Global Group */}
           <div>
             <div className="text-[11px] font-semibold text-dark-500 uppercase tracking-wider px-2 mb-1.5">

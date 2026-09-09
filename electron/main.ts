@@ -13,6 +13,7 @@ import { ThemeManager } from './pi/theme-manager';
 import { SettingsManager } from './pi/settings-manager';
 import { SessionManager } from './pi/session-manager';
 import { ProjectManager } from './pi/project-manager';
+import { ExtensionManager } from './pi/extension-manager';
 import { TerminalService } from './terminal/terminal-service';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -31,12 +32,7 @@ function createWindow() {
     minHeight: 620,
     backgroundColor: '#121214',
     show: true,
-    titleBarStyle: 'hidden',
-    titleBarOverlay: {
-      color: '#121214',
-      symbolColor: '#a1a1aa',
-      height: 38
-    },
+    frame: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       nodeIntegration: false,
@@ -218,6 +214,12 @@ function setupIpc() {
 
   // Online Models
   ipcMain.handle('models:list-all-online', async () => SettingsManager.getAvailableOnlineModels());
+
+  // Extensions
+  ipcMain.handle('extensions:list', async (_, projectDir) => ExtensionManager.listExtensions(projectDir));
+  ipcMain.handle('extensions:toggle', async (_, { name, enabled, projectDir }) =>
+    ExtensionManager.toggleExtension(name, enabled, projectDir));
+  ipcMain.handle('extensions:open-folder', async () => ExtensionManager.openExtensionsFolder());
 
   // Extension Options
   ipcMain.handle('extensions:get-options', async (_, name) => SettingsManager.getExtensionOptions(name));

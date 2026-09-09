@@ -9,7 +9,7 @@ interface AboutViewProps {
 
 export const AboutView: React.FC<AboutViewProps> = ({ info, username }) => {
   return (
-    <div className="flex-1 flex flex-col h-full bg-dark-900 text-dark-200 overflow-hidden select-none">
+    <div className="flex-1 flex flex-col h-full bg-dark-900 text-dark-200 overflow-hidden">
       <div className="p-5 border-b border-dark-800">
         <h2 className="text-base font-semibold text-white flex items-center gap-2">
           <Info size={18} className="text-blue-400" />

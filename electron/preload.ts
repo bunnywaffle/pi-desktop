@@ -111,6 +111,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Online Models Catalog
   listAllOnlineModels: () => ipcRenderer.invoke('models:list-all-online'),
 
+  // Extensions
+  listExtensions: (projectDir?: string) => ipcRenderer.invoke('extensions:list', projectDir),
+  toggleExtension: (name: string, enabled: boolean, projectDir?: string) =>
+    ipcRenderer.invoke('extensions:toggle', { name, enabled, projectDir }),
+  openExtensionsFolder: () => ipcRenderer.invoke('extensions:open-folder'),
+
   // Extension Options
   getExtensionOptions: (name: string) => ipcRenderer.invoke('extensions:get-options', name),
   saveExtensionOptions: (name: string, options: any) =>

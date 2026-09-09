@@ -4,7 +4,7 @@ import { Sidebar, NavTab } from './components/layout/Sidebar';
 import { StatusBar } from './components/layout/StatusBar';
 import { EmptyHeroState } from './components/chat/EmptyHeroState';
 import { MessageList } from './components/chat/MessageList';
-import { BottomInputDock } from './components/chat/BottomInputDock';
+import { BottomInputDock, getModelProviderInfo } from './components/chat/BottomInputDock';
 import { UiBridgeModal } from './components/ui-bridge/UiBridgeModal';
 import { ToastContainer, ToastItem } from './components/ui-bridge/ToastContainer';
 import { WidgetPanel } from './components/ui-bridge/WidgetPanel';
@@ -141,8 +141,28 @@ export const App: React.FC = () => {
       // Fetch models
       try {
         const modelsRes = await (window as any).electronAPI.getAvailableModels();
-        if (modelsRes && modelsRes.models) {
-          setModels(modelsRes.models);
+        let loadedModels: PiModel[] = modelsRes?.models || [];
+
+        if ((window as any).electronAPI?.listAllOnlineModels) {
+          const online = await (window as any).electronAPI.listAllOnlineModels();
+          if (online && online.length > 0) {
+            const existing = new Set(loadedModels.map(m => m.id.toLowerCase()));
+            for (const o of online) {
+              if (!existing.has(o.id.toLowerCase())) {
+                loadedModels.push({
+                  id: o.id,
+                  name: o.name || o.id,
+                  provider: o.provider,
+                  supportsThinking: o.thinking
+                });
+                existing.add(o.id.toLowerCase());
+              }
+            }
+          }
+        }
+
+        if (loadedModels.length > 0) {
+          setModels(loadedModels);
         }
       } catch {
         // ignore
@@ -423,7 +443,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-dark-900 overflow-hidden font-sans select-none">
+    <div className="h-screen w-screen flex flex-col bg-dark-900 overflow-hidden font-sans">
       {/* Top Title Bar */}
       <TitleBar
         appName="Pi"
@@ -542,6 +562,7 @@ export const App: React.FC = () => {
         version={piInfo?.version}
         projectName={currentProject?.name}
         modelName={selectedModel}
+        providerName={getModelProviderInfo({ id: selectedModel }).providerName}
         stats={sessionStats}
         statusText={statusText}
       />

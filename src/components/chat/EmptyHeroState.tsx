@@ -39,7 +39,7 @@ export const EmptyHeroState: React.FC<EmptyHeroStateProps> = ({ projectName, onS
   ];
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-8 select-none text-center max-w-3xl mx-auto">
+    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center max-w-3xl mx-auto">
       {/* Robot / Cloud Icon */}
       <div className="w-14 h-14 rounded-2xl bg-dark-800/80 border border-dark-700/60 flex items-center justify-center text-dark-400 mb-6 shadow-md">
         <Cloud size={28} className="text-dark-300" />

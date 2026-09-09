@@ -15,9 +15,9 @@ interface StatusBarProps {
 export const StatusBar: React.FC<StatusBarProps> = ({
   isAlive,
   version = '0.85.1',
-  projectName = 'Electron',
-  modelName = 'nemotron-3-nano-omni-30b',
-  providerName = 'bansos',
+  projectName = 'Workspace',
+  modelName = '',
+  providerName = 'Pi',
   stats,
   statusText
 }) => {

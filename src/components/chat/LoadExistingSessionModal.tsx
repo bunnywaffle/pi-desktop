@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { History, Search, X, Folder, Calendar, MessageSquare, ArrowRight, RefreshCw, Cpu } from 'lucide-react';
 import { PiSessionSummary } from '../../types/pi';
 
@@ -58,7 +58,7 @@ export const LoadExistingSessionModal: React.FC<LoadExistingSessionModalProps> =
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in select-none">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
       <div className="bg-dark-900 border border-dark-700 rounded-xl shadow-2xl max-w-2xl w-full flex flex-col max-h-[85vh] text-xs">
         {/* Header */}
         <div className="p-4 border-b border-dark-800 flex items-center justify-between">
@@ -98,7 +98,7 @@ export const LoadExistingSessionModal: React.FC<LoadExistingSessionModalProps> =
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search sessions by name, workspace folder, or model..."
-              className="w-full bg-dark-900 border border-dark-750 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder-dark-500 outline-none focus:border-purple-500 font-mono"
+              className="w-full bg-dark-900 border border-dark-750 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder-dark-500 outline-none focus:border-purple-500 font-mono select-text cursor-text"
               autoFocus
             />
           </div>

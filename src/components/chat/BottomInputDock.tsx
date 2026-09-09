@@ -1,15 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Folder,
-  Laptop,
   GitBranch,
-  Plus,
-  AlertCircle,
   ChevronDown,
-  Mic,
   ArrowUp,
   Square,
-  Sparkles
+  Sparkles,
+  Brain,
+  Search,
+  Check
 } from 'lucide-react';
 import { PiModel } from '../../types/pi';
 
@@ -27,6 +26,126 @@ interface BottomInputDockProps {
   prefilledText?: string;
 }
 
+export interface ResolvedModelInfo {
+  providerName: string;
+  providerBadgeClass: string;
+  displayTitle: string;
+  isFree: boolean;
+}
+
+export function getModelProviderInfo(model: { id: string; name?: string; provider?: string }): ResolvedModelInfo {
+  const rawProvider = (model.provider || '').toLowerCase().trim();
+  const id = model.id.toLowerCase().trim();
+  const isFree = id.includes(':free') || rawProvider.includes('free') || rawProvider.includes('bansos');
+
+  if (rawProvider.includes('openrouter') || id.startsWith('openrouter/')) {
+    return {
+      providerName: 'OpenRouter',
+      providerBadgeClass: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/35',
+      displayTitle: model.name || model.id.replace(/^openrouter\//, ''),
+      isFree
+    };
+  }
+
+  if (rawProvider.includes('bansos') || isFree) {
+    return {
+      providerName: 'Bansos (Free)',
+      providerBadgeClass: 'bg-teal-500/20 text-teal-300 border-teal-500/35',
+      displayTitle: model.name || model.id.replace(/:free$/, ''),
+      isFree: true
+    };
+  }
+
+  if (rawProvider.includes('ollama') || id.startsWith('ollama/')) {
+    return {
+      providerName: 'Ollama (Local)',
+      providerBadgeClass: 'bg-pink-500/20 text-pink-300 border-pink-500/35',
+      displayTitle: model.name || model.id.replace(/^ollama\//, ''),
+      isFree: true
+    };
+  }
+
+  if (rawProvider.includes('anthropic') || id.startsWith('claude')) {
+    return {
+      providerName: 'Anthropic',
+      providerBadgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/35',
+      displayTitle: model.name || model.id,
+      isFree: false
+    };
+  }
+
+  if (rawProvider.includes('openai') || id.startsWith('gpt') || id.startsWith('o1') || id.startsWith('o3')) {
+    return {
+      providerName: 'OpenAI',
+      providerBadgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/35',
+      displayTitle: model.name || model.id,
+      isFree: false
+    };
+  }
+
+  if (rawProvider.includes('google') || id.startsWith('gemini')) {
+    return {
+      providerName: 'Google',
+      providerBadgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/35',
+      displayTitle: model.name || model.id,
+      isFree: false
+    };
+  }
+
+  if (rawProvider.includes('deepseek') || id.startsWith('deepseek')) {
+    return {
+      providerName: 'DeepSeek',
+      providerBadgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/35',
+      displayTitle: model.name || model.id,
+      isFree: false
+    };
+  }
+
+  if (rawProvider.includes('groq') || id.startsWith('groq/')) {
+    return {
+      providerName: 'Groq',
+      providerBadgeClass: 'bg-orange-500/20 text-orange-300 border-orange-500/35',
+      displayTitle: model.name || model.id.replace(/^groq\//, ''),
+      isFree: false
+    };
+  }
+
+  if (rawProvider.includes('cerebras') || id.startsWith('cerebras/')) {
+    return {
+      providerName: 'Cerebras',
+      providerBadgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/35',
+      displayTitle: model.name || model.id.replace(/^cerebras\//, ''),
+      isFree: false
+    };
+  }
+
+  if (rawProvider) {
+    return {
+      providerName: rawProvider.charAt(0).toUpperCase() + rawProvider.slice(1),
+      providerBadgeClass: 'bg-dark-800 text-dark-300 border-dark-700',
+      displayTitle: model.name || model.id,
+      isFree
+    };
+  }
+
+  if (model.id.includes('/')) {
+    const prefix = model.id.split('/')[0];
+    return {
+      providerName: prefix.charAt(0).toUpperCase() + prefix.slice(1),
+      providerBadgeClass: 'bg-dark-800 text-dark-300 border-dark-700',
+      displayTitle: model.name || model.id,
+      isFree
+    };
+  }
+
+  return {
+    providerName: 'Default',
+    providerBadgeClass: 'bg-dark-800 text-dark-400 border-dark-700',
+    displayTitle: model.name || model.id,
+    isFree: false
+  };
+}
+
 export const BottomInputDock: React.FC<BottomInputDockProps> = ({
   projectName,
   branch = 'master',
@@ -41,26 +160,60 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
   prefilledText = ''
 }) => {
   const [text, setText] = useState(prefilledText);
-  const [hasFullAccess, setHasFullAccess] = useState(true);
   const [showModelPicker, setShowModelPicker] = useState(false);
+  const [showThinkingPicker, setShowThinkingPicker] = useState(false);
   const [modelSearchQuery, setModelSearchQuery] = useState('');
+  const [selectedProviderFilter, setSelectedProviderFilter] = useState('all');
   const [streamingQueueMode, setStreamingQueueMode] = useState<'steer' | 'followUp'>('steer');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
 
   const fallbackModels: PiModel[] = [
-    { id: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free', supportsThinking: true },
-    { id: 'meta-llama/llama-3.3-70b-instruct:free', supportsThinking: false },
-    { id: 'claude-3-7-sonnet-latest', supportsThinking: true },
-    { id: 'gpt-4o', supportsThinking: false },
-    { id: 'o3-mini', supportsThinking: true },
-    { id: 'deepseek/deepseek-r1', supportsThinking: true }
+    { id: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free', provider: 'bansos', supportsThinking: true },
+    { id: 'meta-llama/llama-3.3-70b-instruct:free', provider: 'bansos', supportsThinking: false },
+    { id: 'claude-3-7-sonnet-latest', provider: 'anthropic', supportsThinking: true },
+    { id: 'gpt-4o', provider: 'openai', supportsThinking: false },
+    { id: 'o3-mini', provider: 'openai', supportsThinking: true },
+    { id: 'deepseek/deepseek-r1', provider: 'deepseek', supportsThinking: true }
   ];
 
   const effectiveModels = models && models.length > 0 ? models : fallbackModels;
-  const filteredModels = effectiveModels.filter(m =>
-    m.id.toLowerCase().includes(modelSearchQuery.toLowerCase()) ||
-    (m.name && m.name.toLowerCase().includes(modelSearchQuery.toLowerCase()))
-  );
+
+  // Filter models by query (matching id, name, and provider) and provider pill
+  const filteredModels = effectiveModels.filter(m => {
+    const info = getModelProviderInfo(m);
+    const q = modelSearchQuery.toLowerCase().trim();
+
+    const matchesProvider =
+      selectedProviderFilter === 'all' ||
+      info.providerName.toLowerCase().includes(selectedProviderFilter.toLowerCase());
+
+    if (!matchesProvider) return false;
+    if (!q) return true;
+
+    return (
+      m.id.toLowerCase().includes(q) ||
+      (m.name && m.name.toLowerCase().includes(q)) ||
+      info.providerName.toLowerCase().includes(q) ||
+      info.displayTitle.toLowerCase().includes(q) ||
+      (q === 'free' && info.isFree) ||
+      (q === 'thinking' && m.supportsThinking)
+    );
+  });
+
+  // Close model picker on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setShowModelPicker(false);
+        setShowThinkingPicker(false);
+      }
+    };
+    if (showModelPicker || showThinkingPicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showModelPicker, showThinkingPicker]);
 
   useEffect(() => {
     if (prefilledText !== undefined && prefilledText !== null) {
@@ -93,25 +246,27 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
     setText('');
   };
 
+  const currentModelInfo = getModelProviderInfo({ id: selectedModel });
+
   return (
     <div className="w-full max-w-3xl mx-auto px-4 pb-4">
-      <div className="bg-dark-900 border border-dark-700/80 rounded-2xl shadow-2xl p-2.5 transition-all focus-within:border-dark-600 focus-within:ring-1 focus-within:ring-dark-600/50">
+      <div
+        onClick={() => textareaRef.current?.focus()}
+        className="bg-dark-900 border border-dark-700/80 rounded-2xl shadow-2xl p-2.5 transition-all focus-within:border-dark-600 focus-within:ring-1 focus-within:ring-dark-600/50 cursor-text"
+      >
         {/* Top dock info pills */}
-        <div className="flex items-center gap-2 mb-2 px-1 text-[11px] text-dark-400 font-medium">
+        <div className="flex items-center gap-2 mb-2 px-1 text-[11px] text-dark-400 font-medium" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-dark-800/80 text-dark-300">
             <Folder size={11} className="text-dark-400" />
-            <span>{projectName}</span>
+            <span>{projectName || 'Workspace'}</span>
           </div>
 
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-dark-800/80 text-dark-300">
-            <Laptop size={11} className="text-dark-400" />
-            <span>Local</span>
-          </div>
-
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-dark-800/80 text-dark-300">
-            <GitBranch size={11} className="text-dark-400" />
-            <span>{branch}</span>
-          </div>
+          {branch && (
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-dark-800/80 text-dark-300">
+              <GitBranch size={11} className="text-dark-400" />
+              <span>{branch}</span>
+            </div>
+          )}
 
           {isStreaming && (
             <div className="ml-auto flex items-center gap-1.5 text-xs text-amber-400 font-medium animate-pulse">
@@ -126,84 +281,131 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Do anything"
+          placeholder="Ask Pi or give instructions (Enter to send, Shift+Enter for new line)..."
           rows={2}
-          className="w-full bg-transparent resize-none outline-none text-sm text-dark-100 placeholder-dark-500 px-2 py-1 leading-relaxed"
+          className="w-full bg-transparent resize-none outline-none text-sm text-dark-100 placeholder-dark-500 px-2 py-1 leading-relaxed select-text cursor-text"
         />
 
         {/* Bottom controls bar */}
-        <div className="flex items-center justify-between pt-1 px-1 text-xs">
-          {/* Left tools: + and Access badge */}
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between pt-1 px-1 text-xs" onClick={(e) => e.stopPropagation()}>
+          {/* Left tools: Reasoning effort level selector */}
+          <div className="relative">
             <button
-              className="p-1 text-dark-400 hover:text-dark-200 hover:bg-dark-800 rounded-md transition"
-              title="Add attachment or context"
+              onClick={() => {
+                setShowThinkingPicker(!showThinkingPicker);
+                setShowModelPicker(false);
+              }}
+              className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-dark-800/80 hover:bg-dark-800 border border-dark-750 text-dark-300 hover:text-white transition text-[11px] font-medium"
+              title="Change reasoning thinking level"
             >
-              <Plus size={16} />
+              <Brain size={12} className="text-purple-400" />
+              <span className="capitalize">{thinkingLevel}</span>
+              <ChevronDown size={11} className="text-dark-500" />
             </button>
 
-            <button
-              onClick={() => setHasFullAccess(!hasFullAccess)}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-medium transition ${hasFullAccess ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:border-amber-500/50' : 'bg-dark-800 border-dark-700 text-dark-400'}`}
-              title="Click to toggle Full Access / Read-Only approval"
-            >
-              <AlertCircle size={11} className={hasFullAccess ? 'text-amber-400' : 'text-dark-400'} />
-              <span>{hasFullAccess ? 'Full access' : 'Read only'}</span>
-            </button>
+            {showThinkingPicker && (
+              <div
+                ref={pickerRef}
+                className="absolute left-0 bottom-9 w-40 bg-dark-900 border border-dark-700 rounded-xl shadow-2xl p-1.5 z-50 text-xs flex flex-col space-y-0.5 animate-in fade-in"
+              >
+                <div className="px-2 py-1 text-[10px] uppercase font-semibold text-dark-500 border-b border-dark-800 mb-1">
+                  Reasoning Effort
+                </div>
+                {(['off', 'minimal', 'low', 'medium', 'high'] as const).map((lvl) => (
+                  <button
+                    key={lvl}
+                    onClick={() => {
+                      onSelectThinkingLevel(lvl);
+                      setShowThinkingPicker(false);
+                    }}
+                    className={`w-full text-left px-2 py-1 rounded-lg flex items-center justify-between capitalize text-[11px] transition ${thinkingLevel === lvl ? 'bg-purple-600/30 text-purple-200 font-medium' : 'hover:bg-dark-800 text-dark-300'}`}
+                  >
+                    <span>{lvl}</span>
+                    {thinkingLevel === lvl && <Check size={11} className="text-purple-400" />}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Right controls: Model Picker, Voice, Send/Stop */}
+          {/* Right controls: Model Picker with Provider Badges & Send button */}
           <div className="flex items-center gap-2 relative">
-            {/* Model Selector dropdown with Live Search */}
+            {/* Model Selector dropdown with Live Search & Provider Display */}
             <div className="relative">
               <button
-                onClick={() => setShowModelPicker(!showModelPicker)}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-dark-800 hover:bg-dark-750 text-dark-300 hover:text-dark-100 transition text-[11px] font-medium border border-dark-700/60"
-                title="Select model or search available models"
+                onClick={() => {
+                  setShowModelPicker(!showModelPicker);
+                  setShowThinkingPicker(false);
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-dark-800 hover:bg-dark-750 text-dark-200 hover:text-white transition text-[11px] font-medium border border-dark-700/80 shadow-xs"
+                title="Select model and view provider details"
               >
                 <Sparkles size={12} className="text-pi-accent" />
-                <span className="truncate max-w-[140px] font-mono">
-                  {selectedModel || 'Select Model'}
+                <span className={`px-1 py-0.2 rounded text-[9px] font-mono border ${currentModelInfo.providerBadgeClass || 'bg-dark-900 text-dark-400'}`}>
+                  {currentModelInfo.providerName}
+                </span>
+                <span className="truncate max-w-[130px] font-mono">
+                  {currentModelInfo.displayTitle || selectedModel || 'Select Model'}
                 </span>
                 <ChevronDown size={12} className="text-dark-400" />
               </button>
 
               {showModelPicker && (
-                <div className="absolute right-0 bottom-9 w-72 bg-dark-900 border border-dark-700 rounded-xl shadow-2xl p-2 z-50 text-xs flex flex-col max-h-80 animate-in fade-in">
-                  <div className="px-1 pb-1.5 flex items-center justify-between border-b border-dark-800 mb-1.5">
-                    <span className="text-[10px] uppercase font-semibold text-dark-400 tracking-wider">
-                      Select Model
-                    </span>
-                    <span className="text-[10px] font-mono text-dark-500">
+                <div
+                  ref={pickerRef}
+                  className="absolute right-0 bottom-9 w-96 bg-dark-900 border border-dark-700 rounded-xl shadow-2xl p-2.5 z-50 text-xs flex flex-col max-h-96 animate-in fade-in"
+                >
+                  <div className="px-1 pb-2 flex items-center justify-between border-b border-dark-800 mb-2">
+                    <div>
+                      <span className="text-[11px] font-semibold text-white">Select Model</span>
+                      <span className="text-[10px] text-dark-400 block">Providers clearly identified for each model</span>
+                    </div>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-dark-800 text-dark-400 border border-dark-750">
                       {filteredModels.length} models
                     </span>
                   </div>
 
                   {/* Search bar inside model picker */}
                   <div className="relative mb-2">
+                    <Search size={13} className="absolute left-2.5 top-2 text-dark-500" />
                     <input
                       type="text"
                       value={modelSearchQuery}
                       onChange={(e) => setModelSearchQuery(e.target.value)}
-                      placeholder="Search models (e.g. claude, gpt, nemotron)..."
-                      className="w-full bg-dark-950 border border-dark-750 rounded-lg px-2.5 py-1 text-[11px] font-mono text-white placeholder-dark-500 outline-none focus:border-pi-accent"
+                      placeholder="Search by model or provider (e.g. claude, ollama, free)..."
+                      className="w-full bg-dark-950 border border-dark-750 rounded-lg pl-8 pr-7 py-1.5 text-[11px] text-white placeholder-dark-500 outline-none focus:border-pi-accent select-text cursor-text font-mono"
                       autoFocus
                     />
                     {modelSearchQuery && (
                       <button
                         onClick={() => setModelSearchQuery('')}
-                        className="absolute right-2 top-1.5 text-dark-500 hover:text-dark-300 text-[10px]"
+                        className="absolute right-2.5 top-1.5 text-dark-500 hover:text-dark-300 text-xs"
                       >
                         ✕
                       </button>
                     )}
                   </div>
 
+                  {/* Provider filter pills */}
+                  <div className="flex items-center gap-1 overflow-x-auto pb-1.5 mb-1 text-[10px] no-scrollbar">
+                    {['all', 'Bansos', 'OpenRouter', 'Ollama', 'Anthropic', 'OpenAI', 'Groq', 'DeepSeek'].map(p => (
+                      <button
+                        key={p}
+                        onClick={() => setSelectedProviderFilter(p === 'all' ? 'all' : p)}
+                        className={`px-2 py-0.5 rounded font-medium whitespace-nowrap transition border ${selectedProviderFilter.toLowerCase() === p.toLowerCase() ? 'bg-pi-accent text-white border-pi-accent' : 'bg-dark-950 border-dark-800 text-dark-400 hover:text-white'}`}
+                      >
+                        {p === 'all' ? 'All' : p}
+                      </button>
+                    ))}
+                  </div>
+
                   {/* Model Items */}
-                  <div className="overflow-y-auto flex-1 space-y-0.5 max-h-56 pr-0.5">
+                  <div className="overflow-y-auto flex-1 space-y-1 max-h-60 pr-0.5">
                     {filteredModels.length > 0 ? (
                       filteredModels.map(m => {
                         const isSelected = selectedModel === m.id;
+                        const info = getModelProviderInfo(m);
+
                         return (
                           <button
                             key={m.id}
@@ -212,19 +414,35 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
                               setShowModelPicker(false);
                               setModelSearchQuery('');
                             }}
-                            className={`w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-dark-800 transition flex items-center justify-between text-[11px] font-mono ${isSelected ? 'text-pi-accent font-semibold bg-dark-800/90' : 'text-dark-300'}`}
+                            className={`w-full text-left p-2 rounded-lg border transition flex flex-col gap-0.5 ${isSelected ? 'bg-dark-800 border-pi-accent text-white shadow-xs' : 'bg-dark-950/60 border-dark-800/80 hover:bg-dark-800/80 hover:border-dark-700 text-dark-200'}`}
                           >
-                            <span className="truncate pr-2">{m.id}</span>
-                            {m.supportsThinking && (
-                              <span className="text-[9px] px-1 py-0.2 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 whitespace-nowrap">
-                                thinking
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-semibold text-white truncate text-xs">
+                                {info.displayTitle}
                               </span>
-                            )}
+                              <span className={`px-1.5 py-0.2 rounded text-[9px] font-mono border font-medium flex-shrink-0 ${info.providerBadgeClass}`}>
+                                {info.providerName}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center justify-between text-[10px] text-dark-400 font-mono mt-0.5">
+                              <span className="truncate max-w-[220px] text-dark-500">{m.id}</span>
+                              <div className="flex items-center gap-1.5 flex-shrink-0">
+                                {info.isFree && (
+                                  <span className="text-teal-400 font-medium text-[9px]">Free</span>
+                                )}
+                                {m.supportsThinking && (
+                                  <span className="px-1 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[9px]">
+                                    thinking
+                                  </span>
+                                )}
+                              </div>
+                            </div>
                           </button>
                         );
                       })
                     ) : (
-                      <div className="p-3 text-center text-dark-500 text-[11px] italic">
+                      <div className="p-4 text-center text-dark-500 text-[11px] italic">
                         No models matching &quot;{modelSearchQuery}&quot;
                       </div>
                     )}
@@ -232,11 +450,6 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
                 </div>
               )}
             </div>
-
-            {/* Mic voice icon */}
-            <button className="p-1 text-dark-400 hover:text-dark-200 transition" title="Voice dictation">
-              <Mic size={15} />
-            </button>
 
             {/* Submit or Stop button */}
             {isStreaming ? (

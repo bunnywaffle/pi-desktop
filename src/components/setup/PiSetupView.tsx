@@ -52,7 +52,7 @@ export const PiSetupView: React.FC<PiSetupViewProps> = ({ info, onScan }) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-8 bg-dark-950 text-dark-200 select-none">
+    <div className="flex-1 flex flex-col items-center justify-center p-8 bg-dark-950 text-dark-200">
       <div className="max-w-xl w-full bg-dark-900 border border-dark-800 rounded-2xl p-6 shadow-2xl space-y-6">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-xl bg-pi-accent/15 border border-pi-accent/30 text-pi-accent flex items-center justify-center mx-auto shadow-sm">

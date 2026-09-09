@@ -1,13 +1,9 @@
 import React from 'react';
 import {
-  ChevronLeft,
-  ChevronRight,
-  Search,
   PanelLeftClose,
   Minus,
   Square,
   X,
-  ChevronDown,
   Plus
 } from 'lucide-react';
 
@@ -41,28 +37,18 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     >
       {/* Left controls */}
       <div className="flex items-center gap-3" style={{ WebkitAppRegion: 'no-drag' } as any}>
-        <div className="flex items-center text-dark-500 gap-1">
-          <button className="p-1 hover:text-dark-200 hover:bg-dark-800 rounded transition" title="Back">
-            <ChevronLeft size={14} />
-          </button>
-          <button className="p-1 hover:text-dark-200 hover:bg-dark-800 rounded transition opacity-40 cursor-not-allowed" title="Forward">
-            <ChevronRight size={14} />
-          </button>
-        </div>
-
-        {/* Menu bar */}
-        <div className="flex items-center gap-3 text-dark-300 font-medium">
-          <span className="cursor-pointer hover:text-white transition" onClick={onNewChat}>File</span>
-          <span className="cursor-pointer hover:text-white transition" onClick={onOpenSettings}>Edit</span>
-          <span className="cursor-pointer hover:text-white transition" onClick={onToggleSidebar}>View</span>
-          <span className="cursor-pointer hover:text-white transition" onClick={onOpenTerminal}>Terminal</span>
-        </div>
-
-        {/* App dropdown */}
-        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-dark-800/80 text-dark-200 font-semibold cursor-pointer hover:bg-dark-800 transition">
+        {/* App brand badge */}
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-dark-800/90 border border-dark-750 text-white font-semibold shadow-xs">
+          <span className="text-pi-accent font-bold">π</span>
           <span>{appName}</span>
-          <span className="text-[10px] text-pi-accent font-mono font-normal">v{version}</span>
-          <ChevronDown size={11} className="text-dark-400" />
+          <span className="text-[10px] text-dark-400 font-mono font-normal">v{version}</span>
+        </div>
+
+        {/* Menu bar actions */}
+        <div className="flex items-center gap-3 text-dark-300 font-medium">
+          <button className="hover:text-white transition" onClick={onNewChat}>New Chat</button>
+          <button className="hover:text-white transition" onClick={onOpenSettings}>Settings</button>
+          <button className="hover:text-white transition" onClick={onOpenTerminal}>Terminal</button>
         </div>
       </div>
 

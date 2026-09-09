@@ -1,6 +1,7 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Download, Check, Sparkles, Eye, Brain, Server, RefreshCw, Cpu, ExternalLink } from 'lucide-react';
 import { OnlineModelItem } from '../../types/pi';
+import { getModelProviderInfo } from '../chat/BottomInputDock';
 
 interface OnlineModelsCatalogProps {
   onSelectModel?: (modelId: string) => void;
@@ -69,7 +70,7 @@ export const OnlineModelsCatalog: React.FC<OnlineModelsCatalogProps> = ({ onSele
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-dark-900 text-dark-200 overflow-hidden select-none">
+    <div className="flex-1 flex flex-col h-full bg-dark-900 text-dark-200 overflow-hidden">
       {/* Search & Filter Header */}
       <div className="p-4 border-b border-dark-800 bg-dark-950/60 space-y-3">
         <div className="flex items-center justify-between">
@@ -105,7 +106,7 @@ export const OnlineModelsCatalog: React.FC<OnlineModelsCatalogProps> = ({ onSele
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by model name or provider (e.g. qwen, claude, llama, free)..."
-              className="w-full bg-dark-900 border border-dark-700 rounded-lg pl-9 pr-3 py-1.5 text-xs text-dark-100 placeholder-dark-500 outline-none focus:border-purple-500 font-mono"
+              className="w-full bg-dark-900 border border-dark-700 rounded-lg pl-9 pr-3 py-1.5 text-xs text-dark-100 placeholder-dark-500 outline-none focus:border-purple-500 font-mono select-text cursor-text"
             />
           </div>
 
@@ -167,16 +168,18 @@ export const OnlineModelsCatalog: React.FC<OnlineModelsCatalogProps> = ({ onSele
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {filteredModels.map((m) => (
-              <div
-                key={`${m.provider}-${m.id}`}
-                className="bg-dark-950/70 border border-dark-800/90 rounded-xl p-3.5 flex flex-col justify-between hover:border-dark-700 transition shadow-sm group"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <span className="px-2 py-0.5 rounded bg-dark-900 border border-dark-750 text-[10px] font-mono text-purple-300 capitalize">
-                      {m.provider}
-                    </span>
+            {filteredModels.map((m) => {
+              const info = getModelProviderInfo({ id: m.id, provider: m.provider });
+              return (
+                <div
+                  key={`${m.provider}-${m.id}`}
+                  className="bg-dark-950/70 border border-dark-800/90 rounded-xl p-3.5 flex flex-col justify-between hover:border-dark-700 transition shadow-sm group"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-mono border font-medium ${info.providerBadgeClass}`}>
+                        {info.providerName}
+                      </span>
 
                     <div className="flex items-center gap-1">
                       {m.thinking && (
@@ -229,8 +232,9 @@ export const OnlineModelsCatalog: React.FC<OnlineModelsCatalogProps> = ({ onSele
                   </button>
                 </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
+        </div>
         )}
       </div>
     </div>
