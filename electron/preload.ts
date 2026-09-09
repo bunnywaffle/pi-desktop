@@ -4,6 +4,7 @@ import { ExtensionUiResponse } from '../src/types/pi';
 contextBridge.exposeInMainWorld('electronAPI', {
   // System Info
   getSystemUserInfo: () => ipcRenderer.invoke('system:user-info'),
+  getHomeDir: () => ipcRenderer.invoke('system:home-dir'),
   openExternalUrl: (url: string) => ipcRenderer.invoke('system:open-external', url),
 
   // Pi Detection & Setup

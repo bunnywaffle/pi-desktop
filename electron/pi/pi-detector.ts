@@ -23,7 +23,15 @@ export class PiDetector {
     for (const candidate of candidatePaths) {
       const testResult = await this.testExecutable(candidate);
       if (testResult.works) {
-        detectedExe = candidate;
+        let finalExe = candidate;
+        if (os.platform() === 'win32' && !candidate.match(/\.(cmd|exe|bat|ps1)$/i)) {
+          if (fs.existsSync(candidate + '.cmd')) {
+            finalExe = candidate + '.cmd';
+          } else if (fs.existsSync(candidate + '.exe')) {
+            finalExe = candidate + '.exe';
+          }
+        }
+        detectedExe = finalExe;
         version = testResult.version;
         works = true;
         rawOutput = testResult.output;
@@ -41,13 +49,23 @@ export class PiDetector {
 
     // If candidate path test succeeded or didn't, also try running bare `pi` via shell
     if (!works) {
-      const shellTest = await this.testExecutable('pi');
+      const defaultCmd = os.platform() === 'win32' ? 'pi.cmd' : 'pi';
+      const shellTest = await this.testExecutable(defaultCmd);
       if (shellTest.works) {
-        detectedExe = 'pi';
+        detectedExe = defaultCmd;
         version = shellTest.version;
         works = true;
         rawOutput = shellTest.output;
         installMethod = 'npm-global';
+      } else {
+        const bareTest = await this.testExecutable('pi');
+        if (bareTest.works) {
+          detectedExe = 'pi';
+          version = bareTest.version;
+          works = true;
+          rawOutput = bareTest.output;
+          installMethod = 'npm-global';
+        }
       }
     }
 
@@ -138,13 +156,26 @@ export class PiDetector {
     }
 
     // Remove duplicates and filter existing files
-    const unique = Array.from(new Set(candidates)).filter(p => {
+    let unique = Array.from(new Set(candidates)).filter(p => {
       try {
         return fs.existsSync(p);
       } catch {
         return false;
       }
     });
+
+    if (isWin) {
+      unique.sort((a, b) => {
+        const getScore = (p: string) => {
+          if (p.endsWith('.cmd')) return 4;
+          if (p.endsWith('.exe')) return 3;
+          if (p.endsWith('.bat')) return 2;
+          if (p.endsWith('.ps1')) return 1;
+          return 0;
+        };
+        return getScore(b) - getScore(a);
+      });
+    }
 
     return unique;
   }

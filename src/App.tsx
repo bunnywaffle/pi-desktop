@@ -87,6 +87,11 @@ export const App: React.FC = () => {
 
   const loadProjectsAndStart = async () => {
     try {
+      let homeDir = '';
+      try {
+        homeDir = await (window as any).electronAPI?.getHomeDir?.();
+      } catch {}
+
       const projList: PiProject[] = await (window as any).electronAPI.listProjects();
       setProjects(projList || []);
 
@@ -96,7 +101,7 @@ export const App: React.FC = () => {
         await startPiSession(activeProj.path);
       } else {
         setCurrentProject(null);
-        await startPiSession('.');
+        await startPiSession(homeDir || '');
       }
     } catch (err) {
       console.error('Failed to load projects:', err);
@@ -120,25 +125,55 @@ export const App: React.FC = () => {
 
   const startPiSession = async (cwd: string) => {
     try {
+      let homeDir = '';
+      try {
+        homeDir = await (window as any).electronAPI?.getHomeDir?.();
+      } catch {}
+
+      const safeCwd = (cwd && cwd !== '.' && cwd !== './') ? cwd : (homeDir || '');
+
       const settings = await (window as any).electronAPI.readSettings('global');
-      const provider = settings.defaultProvider || 'bansos';
-      const model = settings.defaultModel || 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free';
-      const thinking = settings.defaultThinkingLevel || 'medium';
-
-      setSelectedModel(model);
-      setThinkingLevel(thinking);
-
-      await (window as any).electronAPI.startSession({
-        cwd,
-        provider,
-        model,
-        thinkingLevel: thinking,
+      const startOptions: any = {
+        cwd: safeCwd,
         approveLocal: true
-      });
+      };
+
+      // Only pass if explicitly set by the user in settings! Otherwise let Pi use native defaults!
+      if (settings?.defaultProvider) {
+        startOptions.provider = settings.defaultProvider;
+      }
+      if (settings?.defaultModel) {
+        startOptions.model = settings.defaultModel;
+        setSelectedModel(settings.defaultModel);
+      }
+      if (settings?.defaultThinkingLevel) {
+        startOptions.thinkingLevel = settings.defaultThinkingLevel;
+        setThinkingLevel(settings.defaultThinkingLevel);
+      }
+
+      const res = await (window as any).electronAPI.startSession(startOptions);
+      if (res && res.success === false) {
+        console.warn('Pi startSession warning:', res.error);
+      }
 
       setIsSessionAlive(true);
 
-      // Fetch models
+      // Fetch live state from Pi!
+      try {
+        const state = await (window as any).electronAPI.getState();
+        if (state) {
+          if (state.model) {
+            setSelectedModel(state.model.id || state.model.name || selectedModel);
+          }
+          if (state.thinkingLevel) {
+            setThinkingLevel(state.thinkingLevel);
+          }
+        }
+      } catch (err) {
+        console.warn('Could not query immediate state:', err);
+      }
+
+      // Fetch models supported by Pi on this machine
       try {
         const modelsRes = await (window as any).electronAPI.getAvailableModels();
         let loadedModels: PiModel[] = modelsRes?.models || [];
@@ -167,18 +202,9 @@ export const App: React.FC = () => {
       } catch {
         // ignore
       }
-
-      // Fetch state
-      try {
-        const state = await (window as any).electronAPI.getState();
-        if (state && state.model) {
-          setSelectedModel(state.model.id || state.model.name || model);
-        }
-      } catch {
-        // ignore
-      }
     } catch (err) {
       console.error('Error starting Pi session:', err);
+      setIsSessionAlive(false);
     }
   };
 
@@ -293,6 +319,9 @@ export const App: React.FC = () => {
     setIsStreaming(true);
 
     try {
+      if (!isSessionAlive) {
+        await startPiSession(currentProject?.path || '');
+      }
       await (window as any).electronAPI.prompt(text);
     } catch (err: any) {
       setIsStreaming(false);
@@ -331,11 +360,12 @@ export const App: React.FC = () => {
   const handleSelectModel = async (modelId: string) => {
     setSelectedModel(modelId);
     try {
+      const found = models.find(m => m.id === modelId);
       const parts = modelId.split('/');
-      const prov = parts.length > 1 ? parts[0] : 'bansos';
+      const prov = found?.provider || (parts.length > 1 ? parts[0] : '');
       await (window as any).electronAPI.setModel(prov, modelId);
     } catch (err) {
-      console.error(err);
+      console.error('Failed to set model:', err);
     }
   };
 

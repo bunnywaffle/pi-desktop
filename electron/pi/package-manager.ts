@@ -9,7 +9,8 @@ const execAsync = promisify(exec);
 
 export class PackageManager {
   public static async getInstalledPackages(projectDir?: string): Promise<{ global: PiPackage[]; project: PiPackage[] }> {
-    const globalSettingsPath = path.join(os.homedir(), '.pi', 'agent', 'settings.json');
+    const agentDir = process.env.PI_CODING_AGENT_DIR || path.join(os.homedir(), '.pi', 'agent');
+    const globalSettingsPath = path.join(agentDir, 'settings.json');
     const projectSettingsPath = projectDir ? path.join(projectDir, '.pi', 'settings.json') : null;
 
     const globalPkgs = await this.readPackagesFromSettings(globalSettingsPath, 'global');

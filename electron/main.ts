@@ -129,9 +129,15 @@ function setupIpc() {
     return false;
   });
 
+  ipcMain.handle('system:home-dir', () => os.homedir());
+
   // RPC Session
   ipcMain.handle('pi:start-session', async (_, options: any) => {
     try {
+      if (!options) options = {};
+      if (!options.cwd || options.cwd === '.' || options.cwd === './') {
+        options.cwd = os.homedir();
+      }
       if (!options.executablePath) {
         const detected = await PiDetector.detect();
         if (detected.executablePath) {

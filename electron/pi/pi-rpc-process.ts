@@ -1,5 +1,7 @@
 import { spawn, ChildProcess } from 'child_process';
 import * as os from 'os';
+import * as fs from 'fs';
+import * as path from 'path';
 import { EventEmitter } from 'events';
 import { PiSessionState, PiMessage, ExtensionUiRequest, ExtensionUiResponse } from '../../src/types/pi';
 
@@ -21,6 +23,9 @@ export class PiRpcProcess extends EventEmitter {
   private requestIdCounter = 0;
   private currentCwd: string = '';
   private isAlive: boolean = false;
+  private lastStartOptions: PiProcessOptions | null = null;
+  private recentStderr: string[] = [];
+  private lastExitError: string = '';
 
   constructor() {
     super();
@@ -34,27 +39,57 @@ export class PiRpcProcess extends EventEmitter {
     return this.currentCwd;
   }
 
+  public get exitError(): string {
+    return this.lastExitError;
+  }
+
   public async start(options: PiProcessOptions): Promise<void> {
     if (this.alive) {
       await this.stop();
     }
 
-    this.currentCwd = options.cwd;
+    this.lastStartOptions = { ...options };
+
+    // Resolve safe, existing working directory (never '.' or non-existent dir)
+    let safeCwd = options.cwd;
+    if (!safeCwd || safeCwd === '.' || !fs.existsSync(safeCwd)) {
+      safeCwd = os.homedir();
+    }
+    this.currentCwd = safeCwd;
+
     const isWin = os.platform() === 'win32';
     let exe = options.executablePath || 'pi';
+
+    // On Windows, resolve to .cmd or .exe if bare script was given
+    if (isWin) {
+      if (!exe.match(/\.(cmd|exe|bat|ps1)$/i)) {
+        if (fs.existsSync(exe + '.cmd')) {
+          exe = exe + '.cmd';
+        } else if (fs.existsSync(exe + '.exe')) {
+          exe = exe + '.exe';
+        } else if (fs.existsSync(exe + '.bat')) {
+          exe = exe + '.bat';
+        }
+      }
+    }
+
     const args: string[] = ['--mode', 'rpc'];
 
-    if (options.provider) {
-      args.push('--provider', options.provider);
+    // Only pass provider and model if explicitly supplied (otherwise let Pi use its native defaults)
+    if (options.provider && options.provider.trim()) {
+      args.push('--provider', options.provider.trim());
     }
-    if (options.model) {
-      args.push('--model', options.model);
+    if (options.model && options.model.trim()) {
+      args.push('--model', options.model.trim());
     }
-    if (options.thinkingLevel) {
-      args.push('--thinking', options.thinkingLevel);
+    if (options.thinkingLevel && options.thinkingLevel.trim()) {
+      args.push('--thinking', options.thinkingLevel.trim());
     }
-    if (options.sessionName) {
-      args.push('--name', options.sessionName);
+    if (options.sessionName && options.sessionName.trim()) {
+      args.push('--name', options.sessionName.trim());
+    }
+    if (options.sessionFile && options.sessionFile.trim()) {
+      args.push('--continue', options.sessionFile.trim());
     }
     if (options.approveLocal) {
       args.push('--approve');
@@ -69,9 +104,13 @@ export class PiRpcProcess extends EventEmitter {
     }
 
     this.lineBuffer = '';
+    this.recentStderr = [];
+    this.lastExitError = '';
+
     this.child = spawn(spawnCmd, spawnArgs, {
-      cwd: options.cwd,
+      cwd: safeCwd,
       shell: isWin,
+      windowsHide: true,
       env: {
         ...process.env,
         PI_OFFLINE: '0'
@@ -86,28 +125,46 @@ export class PiRpcProcess extends EventEmitter {
 
     this.child.stderr?.on('data', (chunk: Buffer) => {
       const text = chunk.toString();
+      this.recentStderr.push(text);
+      if (this.recentStderr.length > 50) this.recentStderr.shift();
       this.emit('stderr', text);
     });
 
     this.child.on('error', (err) => {
       this.isAlive = false;
+      this.lastExitError = err.message || String(err);
       this.emit('error', err);
     });
 
     this.child.on('close', (code) => {
       this.isAlive = false;
       this.child = null;
+      const recent = this.recentStderr.join('').trim();
+      this.lastExitError = recent ? recent.slice(-600) : `Process exited with code ${code}`;
       this.emit('close', code);
       // Reject any pending requests
       for (const [id, req] of this.pendingRequests.entries()) {
         clearTimeout(req.timeout);
-        req.reject(new Error(`Process exited with code ${code}`));
+        req.reject(new Error(`Pi process terminated (code ${code}): ${this.lastExitError}`));
       }
       this.pendingRequests.clear();
     });
 
-    // Wait slightly to ensure process spawned or rejected
-    await new Promise((r) => setTimeout(r, 600));
+    // Wait slightly to verify spawn succeeded and did not immediately crash
+    await new Promise((r) => setTimeout(r, 800));
+
+    if (!this.isAlive || !this.child) {
+      throw new Error(`Pi process failed to start: ${this.lastExitError || 'Immediate exit'}`);
+    }
+  }
+
+  public async ensureAlive(): Promise<void> {
+    if (this.alive) return;
+    const opts: PiProcessOptions = this.lastStartOptions || {
+      cwd: this.currentCwd || os.homedir(),
+      approveLocal: true
+    };
+    await this.start(opts);
   }
 
   public async stop(): Promise<void> {
@@ -190,10 +247,18 @@ export class PiRpcProcess extends EventEmitter {
     }
   }
 
-  public sendRpcCommand<T = any>(command: string, params: Record<string, any> = {}, timeoutMs = 45000): Promise<T> {
+  public async sendRpcCommand<T = any>(command: string, params: Record<string, any> = {}, timeoutMs = 45000): Promise<T> {
+    if (!this.child || !this.child.stdin || !this.isAlive) {
+      try {
+        await this.ensureAlive();
+      } catch (err: any) {
+        throw new Error(`Pi process is not running: ${err.message || this.lastExitError || 'Failed to start Pi agent'}`);
+      }
+    }
+
     return new Promise((resolve, reject) => {
       if (!this.child || !this.child.stdin || !this.isAlive) {
-        return reject(new Error('Pi process is not running'));
+        return reject(new Error(`Pi process is not running: ${this.lastExitError || 'Process not ready'}`));
       }
 
       const id = `req-${++this.requestIdCounter}-${Date.now()}`;

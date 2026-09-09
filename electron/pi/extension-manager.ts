@@ -6,8 +6,12 @@ import { PiExtension } from '../../src/types/pi';
 import { SettingsManager } from './settings-manager';
 
 export class ExtensionManager {
+  public static getPiAgentDir(): string {
+    return process.env.PI_CODING_AGENT_DIR || path.join(os.homedir(), '.pi', 'agent');
+  }
+
   public static getGlobalExtensionsDir(): string {
-    return path.join(os.homedir(), '.pi', 'agent', 'extensions');
+    return path.join(this.getPiAgentDir(), 'extensions');
   }
 
   public static getProjectExtensionsDir(projectDir: string): string {
@@ -185,6 +189,18 @@ export class ExtensionManager {
   }
 
   private static getPackageDescription(pkgName: string): string {
+    // 1. Try reading real description from installed package.json on disk
+    try {
+      const nodeModulesDir = path.join(this.getPiAgentDir(), 'npm', 'node_modules');
+      const pkgJsonPath = path.join(nodeModulesDir, pkgName, 'package.json');
+      if (fs.existsSync(pkgJsonPath)) {
+        const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
+        if (pkgJson.description) {
+          return pkgJson.description;
+        }
+      }
+    } catch {}
+
     const knownMap: Record<string, string> = {
       'pi-bansos': 'Free API provider extension for OpenRouter, Cerebras, and Groq models',
       'pi-mcp-adapter': 'Model Context Protocol (MCP) bridge for integrating external tools',
@@ -198,6 +214,6 @@ export class ExtensionManager {
       'agent-router.ts': 'Dynamic routing between coding models and task planners',
       'memory.ts': 'Persistent semantic memory across chat sessions'
     };
-    return knownMap[pkgName] || 'Installed Pi package extension module';
+    return knownMap[pkgName] || `Installed extension package (${pkgName})`;
   }
 }

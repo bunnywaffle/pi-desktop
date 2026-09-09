@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Folder,
   GitBranch,
@@ -35,114 +35,58 @@ export interface ResolvedModelInfo {
 
 export function getModelProviderInfo(model: { id: string; name?: string; provider?: string }): ResolvedModelInfo {
   const rawProvider = (model.provider || '').toLowerCase().trim();
-  const id = model.id.toLowerCase().trim();
-  const isFree = id.includes(':free') || rawProvider.includes('free') || rawProvider.includes('bansos');
+  const id = (model.id || '').toLowerCase().trim();
+  const isFree = id.includes(':free') || rawProvider.includes('free');
+
+  let providerName = '';
+  let providerBadgeClass = 'bg-dark-800 text-dark-300 border-dark-700';
 
   if (rawProvider.includes('openrouter') || id.startsWith('openrouter/')) {
-    return {
-      providerName: 'OpenRouter',
-      providerBadgeClass: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/35',
-      displayTitle: model.name || model.id.replace(/^openrouter\//, ''),
-      isFree
-    };
+    providerName = 'OpenRouter';
+    providerBadgeClass = 'bg-indigo-500/20 text-indigo-300 border-indigo-500/35';
+  } else if (rawProvider.includes('anthropic') || id.startsWith('claude') || id.startsWith('anthropic/')) {
+    providerName = 'Anthropic';
+    providerBadgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/35';
+  } else if (rawProvider.includes('openai') || id.startsWith('gpt') || id.startsWith('o1') || id.startsWith('o3') || id.startsWith('openai/')) {
+    providerName = 'OpenAI';
+    providerBadgeClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/35';
+  } else if (rawProvider.includes('google') || id.startsWith('gemini') || id.startsWith('google/')) {
+    providerName = 'Google';
+    providerBadgeClass = 'bg-blue-500/20 text-blue-300 border-blue-500/35';
+  } else if (rawProvider.includes('groq') || id.startsWith('groq/')) {
+    providerName = 'Groq';
+    providerBadgeClass = 'bg-orange-500/20 text-orange-300 border-orange-500/35';
+  } else if (rawProvider.includes('deepseek') || id.startsWith('deepseek/')) {
+    providerName = 'DeepSeek';
+    providerBadgeClass = 'bg-cyan-500/20 text-cyan-300 border-cyan-500/35';
+  } else if (rawProvider.includes('ollama') || id.startsWith('ollama/')) {
+    providerName = 'Ollama (Local)';
+    providerBadgeClass = 'bg-pink-500/20 text-pink-300 border-pink-500/35';
+  } else if (rawProvider.includes('cerebras') || id.startsWith('cerebras/')) {
+    providerName = 'Cerebras';
+    providerBadgeClass = 'bg-rose-500/20 text-rose-300 border-rose-500/35';
+  } else if (rawProvider.includes('bansos')) {
+    providerName = 'Bansos';
+    providerBadgeClass = 'bg-teal-500/20 text-teal-300 border-teal-500/35';
+  } else if (rawProvider) {
+    providerName = model.provider ? (model.provider.charAt(0).toUpperCase() + model.provider.slice(1)) : 'Custom';
+    providerBadgeClass = 'bg-purple-500/20 text-purple-300 border-purple-500/35';
+  } else if (id.includes('/')) {
+    const prefix = id.split('/')[0];
+    providerName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+    providerBadgeClass = 'bg-purple-500/20 text-purple-300 border-purple-500/35';
+  } else {
+    providerName = 'Default';
+    providerBadgeClass = 'bg-dark-800 text-dark-400 border-dark-700';
   }
 
-  if (rawProvider.includes('bansos') || isFree) {
-    return {
-      providerName: 'Bansos (Free)',
-      providerBadgeClass: 'bg-teal-500/20 text-teal-300 border-teal-500/35',
-      displayTitle: model.name || model.id.replace(/:free$/, ''),
-      isFree: true
-    };
-  }
-
-  if (rawProvider.includes('ollama') || id.startsWith('ollama/')) {
-    return {
-      providerName: 'Ollama (Local)',
-      providerBadgeClass: 'bg-pink-500/20 text-pink-300 border-pink-500/35',
-      displayTitle: model.name || model.id.replace(/^ollama\//, ''),
-      isFree: true
-    };
-  }
-
-  if (rawProvider.includes('anthropic') || id.startsWith('claude')) {
-    return {
-      providerName: 'Anthropic',
-      providerBadgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/35',
-      displayTitle: model.name || model.id,
-      isFree: false
-    };
-  }
-
-  if (rawProvider.includes('openai') || id.startsWith('gpt') || id.startsWith('o1') || id.startsWith('o3')) {
-    return {
-      providerName: 'OpenAI',
-      providerBadgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/35',
-      displayTitle: model.name || model.id,
-      isFree: false
-    };
-  }
-
-  if (rawProvider.includes('google') || id.startsWith('gemini')) {
-    return {
-      providerName: 'Google',
-      providerBadgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/35',
-      displayTitle: model.name || model.id,
-      isFree: false
-    };
-  }
-
-  if (rawProvider.includes('deepseek') || id.startsWith('deepseek')) {
-    return {
-      providerName: 'DeepSeek',
-      providerBadgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/35',
-      displayTitle: model.name || model.id,
-      isFree: false
-    };
-  }
-
-  if (rawProvider.includes('groq') || id.startsWith('groq/')) {
-    return {
-      providerName: 'Groq',
-      providerBadgeClass: 'bg-orange-500/20 text-orange-300 border-orange-500/35',
-      displayTitle: model.name || model.id.replace(/^groq\//, ''),
-      isFree: false
-    };
-  }
-
-  if (rawProvider.includes('cerebras') || id.startsWith('cerebras/')) {
-    return {
-      providerName: 'Cerebras',
-      providerBadgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/35',
-      displayTitle: model.name || model.id.replace(/^cerebras\//, ''),
-      isFree: false
-    };
-  }
-
-  if (rawProvider) {
-    return {
-      providerName: rawProvider.charAt(0).toUpperCase() + rawProvider.slice(1),
-      providerBadgeClass: 'bg-dark-800 text-dark-300 border-dark-700',
-      displayTitle: model.name || model.id,
-      isFree
-    };
-  }
-
-  if (model.id.includes('/')) {
-    const prefix = model.id.split('/')[0];
-    return {
-      providerName: prefix.charAt(0).toUpperCase() + prefix.slice(1),
-      providerBadgeClass: 'bg-dark-800 text-dark-300 border-dark-700',
-      displayTitle: model.name || model.id,
-      isFree
-    };
-  }
+  const cleanDisplayTitle = model.name || (id.includes('/') ? id.split('/')[1] : id);
 
   return {
-    providerName: 'Default',
-    providerBadgeClass: 'bg-dark-800 text-dark-400 border-dark-700',
-    displayTitle: model.name || model.id,
-    isFree: false
+    providerName,
+    providerBadgeClass,
+    displayTitle: cleanDisplayTitle,
+    isFree
   };
 }
 
@@ -169,15 +113,24 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
   const pickerRef = useRef<HTMLDivElement>(null);
 
   const fallbackModels: PiModel[] = [
-    { id: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free', provider: 'bansos', supportsThinking: true },
-    { id: 'meta-llama/llama-3.3-70b-instruct:free', provider: 'bansos', supportsThinking: false },
-    { id: 'claude-3-7-sonnet-latest', provider: 'anthropic', supportsThinking: true },
-    { id: 'gpt-4o', provider: 'openai', supportsThinking: false },
-    { id: 'o3-mini', provider: 'openai', supportsThinking: true },
-    { id: 'deepseek/deepseek-r1', provider: 'deepseek', supportsThinking: true }
+    { id: 'claude-3-7-sonnet-latest', name: 'Claude 3.7 Sonnet', provider: 'anthropic', supportsThinking: true },
+    { id: 'gpt-4o', name: 'GPT-4o', provider: 'openai', supportsThinking: false },
+    { id: 'o3-mini', name: 'o3-mini', provider: 'openai', supportsThinking: true },
+    { id: 'deepseek-r1', name: 'DeepSeek R1', provider: 'deepseek', supportsThinking: true }
   ];
 
   const effectiveModels = models && models.length > 0 ? models : fallbackModels;
+
+  const dynamicProviders = useMemo(() => {
+    const provs = new Set<string>();
+    for (const m of effectiveModels) {
+      const info = getModelProviderInfo(m);
+      if (info.providerName && info.providerName !== 'Default') {
+        provs.add(info.providerName);
+      }
+    }
+    return ['all', ...Array.from(provs).sort()];
+  }, [effectiveModels]);
 
   // Filter models by query (matching id, name, and provider) and provider pill
   const filteredModels = effectiveModels.filter(m => {
@@ -388,7 +341,7 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
 
                   {/* Provider filter pills */}
                   <div className="flex items-center gap-1 overflow-x-auto pb-1.5 mb-1 text-[10px] no-scrollbar">
-                    {['all', 'Bansos', 'OpenRouter', 'Ollama', 'Anthropic', 'OpenAI', 'Groq', 'DeepSeek'].map(p => (
+                    {dynamicProviders.map(p => (
                       <button
                         key={p}
                         onClick={() => setSelectedProviderFilter(p === 'all' ? 'all' : p)}

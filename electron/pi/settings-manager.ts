@@ -4,8 +4,12 @@ import * as os from 'os';
 import { ProviderAuthStatus } from '../../src/types/pi';
 
 export class SettingsManager {
+  public static getPiAgentDir(): string {
+    return process.env.PI_CODING_AGENT_DIR || path.join(os.homedir(), '.pi', 'agent');
+  }
+
   public static getGlobalSettingsPath(): string {
-    return path.join(os.homedir(), '.pi', 'agent', 'settings.json');
+    return path.join(this.getPiAgentDir(), 'settings.json');
   }
 
   public static getProjectSettingsPath(projectDir: string): string {
@@ -13,7 +17,7 @@ export class SettingsManager {
   }
 
   public static getAuthPath(): string {
-    return path.join(os.homedir(), '.pi', 'agent', 'auth.json');
+    return path.join(this.getPiAgentDir(), 'auth.json');
   }
 
   public static readSettings(scope: 'global' | 'project', projectDir?: string): Record<string, any> {
@@ -299,14 +303,13 @@ export class SettingsManager {
       console.error('Error fetching online models from pi:', err);
       // Return curated fallback list if pi CLI is momentarily busy
       return [
-        { provider: 'bansos', id: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free', contextWindow: '128K', maxTokens: '8K', thinking: true, vision: true },
-        { provider: 'bansos', id: 'meta-llama/llama-3.3-70b-instruct:free', contextWindow: '128K', maxTokens: '4K', thinking: false, vision: false },
-        { provider: 'openrouter', id: 'anthropic/claude-3.7-sonnet', contextWindow: '200K', maxTokens: '64K', thinking: true, vision: true },
-        { provider: 'openrouter', id: 'deepseek/deepseek-r1', contextWindow: '64K', maxTokens: '8K', thinking: true, vision: false },
-        { provider: 'openrouter', id: 'openai/gpt-4o', contextWindow: '128K', maxTokens: '16K', thinking: false, vision: true },
-        { provider: 'google', id: 'gemini-2.5-flash', contextWindow: '1M', maxTokens: '64K', thinking: true, vision: true },
+        { provider: 'anthropic', id: 'claude-3-7-sonnet-latest', contextWindow: '200K', maxTokens: '64K', thinking: true, vision: true },
+        { provider: 'openai', id: 'gpt-4o', contextWindow: '128K', maxTokens: '16K', thinking: false, vision: true },
         { provider: 'openai', id: 'o3-mini', contextWindow: '200K', maxTokens: '100K', thinking: true, vision: false },
-        { provider: 'anthropic', id: 'claude-3-7-sonnet-latest', contextWindow: '200K', maxTokens: '64K', thinking: true, vision: true }
+        { provider: 'google', id: 'gemini-2.5-flash', contextWindow: '1M', maxTokens: '64K', thinking: true, vision: true },
+        { provider: 'deepseek', id: 'deepseek-r1', contextWindow: '64K', maxTokens: '8K', thinking: true, vision: false },
+        { provider: 'openrouter', id: 'anthropic/claude-3.7-sonnet', contextWindow: '200K', maxTokens: '64K', thinking: true, vision: true },
+        { provider: 'openrouter', id: 'meta-llama/llama-3.3-70b-instruct', contextWindow: '128K', maxTokens: '4K', thinking: false, vision: false }
       ];
     }
   }

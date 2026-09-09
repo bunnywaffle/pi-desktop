@@ -5,7 +5,11 @@ import { PiSessionSummary } from '../../src/types/pi';
 
 export class SessionManager {
   public static getSessionStorageDir(): string {
-    return path.join(os.homedir(), '.pi', 'agent', 'sessions');
+    if (process.env.PI_CODING_AGENT_SESSION_DIR) {
+      return process.env.PI_CODING_AGENT_SESSION_DIR;
+    }
+    const agentDir = process.env.PI_CODING_AGENT_DIR || path.join(os.homedir(), '.pi', 'agent');
+    return path.join(agentDir, 'sessions');
   }
 
   public static encodeProjectPath(projectPath: string): string {
