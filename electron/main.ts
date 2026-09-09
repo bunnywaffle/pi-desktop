@@ -70,6 +70,22 @@ function createWindow() {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
 
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https://') || url.startsWith('http://')) {
+      shell.openExternal(url);
+    }
+    return { action: 'deny' };
+  });
+
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (url !== mainWindow?.webContents.getURL()) {
+      event.preventDefault();
+      if (url.startsWith('https://') || url.startsWith('http://')) {
+        shell.openExternal(url);
+      }
+    }
+  });
+
   mainWindow.once('ready-to-show', () => {
     mainWindow?.show();
     mainWindow?.focus();

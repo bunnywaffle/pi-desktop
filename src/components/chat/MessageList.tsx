@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PiMessage, ToolCall } from '../../types/pi';
 import { ToolCallItem } from './ToolCallItem';
+import { MarkdownRenderer } from './MarkdownRenderer';
 import { Copy, Check, ChevronDown, ChevronRight, Brain, User, Bot, AlertCircle, Edit3, RotateCcw } from 'lucide-react';
 
 interface MessageListProps {
@@ -50,9 +51,8 @@ export const MessageList: React.FC<MessageListProps> = ({
               <div className="w-7 h-7 rounded-lg bg-pi-accent/20 border border-pi-accent/40 flex items-center justify-center text-pi-accent flex-shrink-0 mt-0.5">
                 <Bot size={15} />
               </div>
-              <div className="flex-1 text-dark-100 leading-relaxed font-sans prose-dark whitespace-pre-wrap select-text">
-                {streamingText}
-                <span className="inline-block w-1.5 h-4 bg-pi-accent ml-1 animate-pulse" />
+              <div className="flex-1 min-w-0">
+                <MarkdownRenderer content={streamingText} isStreaming={true} />
               </div>
             </div>
           )}
@@ -167,8 +167,8 @@ const MessageItem: React.FC<{
         ))}
 
         {text && (
-          <div className="text-dark-100 leading-relaxed font-sans prose-dark whitespace-pre-wrap select-text">
-            {text}
+          <div className="min-w-0">
+            <MarkdownRenderer content={text} />
           </div>
         )}
 
