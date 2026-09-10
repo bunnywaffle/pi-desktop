@@ -1,6 +1,7 @@
 import React from 'react';
 import { Info, Terminal, Cpu, HardDrive, ExternalLink, ShieldCheck } from 'lucide-react';
 import { PiInstallationInfo } from '../../types/pi';
+import { PiLogo } from '../common/PiLogo';
 
 interface AboutViewProps {
   info: PiInstallationInfo | null;
@@ -22,9 +23,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ info, username }) => {
         {/* System & Agent status card */}
         <div className="p-5 rounded-2xl border border-dark-800 bg-dark-950/60 space-y-4 shadow-sm">
           <div className="flex items-center gap-3 border-b border-dark-800 pb-4">
-            <div className="w-10 h-10 rounded-xl bg-pi-accent/15 border border-pi-accent/30 text-pi-accent flex items-center justify-center font-mono font-bold text-base">
-              π
-            </div>
+            <PiLogo size={42} withBackground className="rounded-xl shadow-md" />
             <div>
               <h3 className="text-sm font-semibold text-white">Pi Coding Agent GUI</h3>
               <p className="text-dark-400">Desktop control manager, RPC bridge, and package coordinator</p>

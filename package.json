@@ -1,6 +1,6 @@
 {
   "name": "pi-desktop",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "type": "module",
   "description": "Modern desktop GUI and control layer for Pi coding agent",
   "main": "dist-electron/main.js",
@@ -18,9 +18,11 @@
     },
     "files": [
       "dist/**/*",
-      "dist-electron/**/*"
+      "dist-electron/**/*",
+      "resources/**/*"
     ],
     "win": {
+      "icon": "resources/icon.ico",
       "target": [
         {
           "target": "portable",

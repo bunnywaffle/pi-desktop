@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Terminal, Download, RefreshCw, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 import { PiInstallationInfo } from '../../types/pi';
+import { PiLogo } from '../common/PiLogo';
 
 interface PiSetupViewProps {
   info: PiInstallationInfo | null;
@@ -55,8 +56,8 @@ export const PiSetupView: React.FC<PiSetupViewProps> = ({ info, onScan }) => {
     <div className="flex-1 flex flex-col items-center justify-center p-8 bg-dark-950 text-dark-200">
       <div className="max-w-xl w-full bg-dark-900 border border-dark-800 rounded-2xl p-6 shadow-2xl space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-xl bg-pi-accent/15 border border-pi-accent/30 text-pi-accent flex items-center justify-center mx-auto shadow-sm">
-            <Terminal size={24} />
+          <div className="mx-auto flex justify-center mb-1">
+            <PiLogo size={48} withBackground className="rounded-2xl shadow-lg" />
           </div>
           <h2 className="text-xl font-bold text-white tracking-tight">Pi Coding Agent Setup</h2>
           <p className="text-xs text-dark-400">

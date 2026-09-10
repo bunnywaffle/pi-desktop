@@ -1,0 +1,51 @@
+﻿import React from 'react';
+
+interface PiLogoProps {
+  size?: number;
+  className?: string;
+  withBackground?: boolean;
+}
+
+export const PiLogo: React.FC<PiLogoProps> = ({
+  size = 24,
+  className = '',
+  withBackground = false
+}) => {
+  if (withBackground) {
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 800 800"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={`inline-block select-none shrink-0 ${className}`}
+      >
+        <rect width="800" height="800" rx="120" fill="#09090b" />
+        <path
+          fill="#ffffff"
+          fillRule="evenodd"
+          d="M165.29 165.29 H517.36 V400 H400 V517.36 H282.65 V634.72 H165.29 Z M282.65 282.65 V400 H400 V282.65 Z"
+        />
+        <path fill="#ffffff" d="M517.36 400 H634.72 V634.72 H517.36 Z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 800 800"
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+      className={`inline-block select-none shrink-0 ${className}`}
+    >
+      <path
+        fillRule="evenodd"
+        d="M165.29 165.29 H517.36 V400 H400 V517.36 H282.65 V634.72 H165.29 Z M282.65 282.65 V400 H400 V282.65 Z"
+      />
+      <path d="M517.36 400 H634.72 V634.72 H517.36 Z" />
+    </svg>
+  );
+};

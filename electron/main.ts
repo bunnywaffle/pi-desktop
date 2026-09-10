@@ -25,12 +25,15 @@ let uiBridge: PiUiBridge;
 const terminal = new TerminalService();
 
 function createWindow() {
+  const iconPath = path.join(__dirname, '../resources/icon.png');
+
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 820,
     minWidth: 960,
     minHeight: 620,
     backgroundColor: '#121214',
+    icon: iconPath,
     show: true,
     frame: false,
     webPreferences: {
