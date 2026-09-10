@@ -115,7 +115,7 @@
         </div>
         <div class="flex items-center gap-2">
           <span class="font-semibold text-white tracking-tight text-sm">Pi Desktop</span>
-          <span id="nav-version" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">v1.0.8</span>
+          <span id="nav-version" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">v1.0.9</span>
         </div>
       </a>
 
@@ -150,7 +150,7 @@
     <!-- Understated Pill -->
     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-800 bg-zinc-900/80 text-xs text-zinc-300 mb-8">
       <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
-      <span class="font-mono text-[11px]">v1.0.8 Release</span>
+      <span class="font-mono text-[11px]">v1.0.9 Release</span>
       <span class="text-zinc-600">&bull;</span>
       <span class="text-zinc-400">Official Brand Mark &amp; Dynamic Theme Engine</span>
     </div>
@@ -167,7 +167,7 @@
 
     <!-- Clean Monochrome Actions -->
     <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
-      <a id="hero-download-btn" href="https://github.com/bunnywaffle/pi-desktop/releases/download/v1.0.8/Pi.Desktop-Portable.exe" class="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-zinc-200 hover:bg-white text-zinc-950 font-semibold text-xs transition">
+      <a id="hero-download-btn" href="https://github.com/bunnywaffle/pi-desktop/releases/download/v1.0.9/Pi.Desktop-Portable.exe" class="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-zinc-200 hover:bg-white text-zinc-950 font-semibold text-xs transition">
         <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
           <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
         </svg>
@@ -605,7 +605,7 @@
         <div class="space-y-3">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">WINDOWS</span>
-            <span id="card-version" class="text-xs font-mono text-zinc-500">v1.0.8</span>
+            <span id="card-version" class="text-xs font-mono text-zinc-500">v1.0.9</span>
           </div>
 
           <h4 class="text-lg font-bold text-white">Portable Executable</h4>
@@ -621,7 +621,7 @@
         </div>
 
         <div class="pt-3 border-t border-zinc-800/80 space-y-2">
-          <a href="https://github.com/bunnywaffle/pi-desktop/releases/download/v1.0.8/Pi.Desktop-Portable.exe" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-zinc-200 hover:bg-white text-zinc-950 font-semibold text-xs transition">
+          <a href="https://github.com/bunnywaffle/pi-desktop/releases/download/v1.0.9/Pi.Desktop-Portable.exe" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-zinc-200 hover:bg-white text-zinc-950 font-semibold text-xs transition">
             <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 16l4-5h-3V4h-2v7H8l4 5zm9 2H3v2h18v-2z"/></svg>
             <span>Download Pi Desktop-Portable.exe</span>
           </a>
@@ -744,7 +744,7 @@
         const releaseRes = await fetch('https://api.github.com/repos/bunnywaffle/pi-desktop/releases/latest');
         if (releaseRes.ok) {
           const releaseData = await releaseRes.json();
-          const tagName = releaseData.tag_name || 'v1.0.8';
+          const tagName = releaseData.tag_name || 'v1.0.9';
           document.getElementById('nav-version').innerText = tagName;
           document.getElementById('card-version').innerText = tagName;
           
