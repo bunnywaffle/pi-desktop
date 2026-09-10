@@ -1,8 +1,12 @@
-﻿# Pi Desktop 🥧⚡
+# Pi Desktop 🥧⚡
 
 > Modern Electron desktop GUI, manager, and control layer for the **[Pi coding agent](https://pi.dev)**.
 
-![Pi Desktop](https://raw.githubusercontent.com/bunnywaffle/pi-desktop/main/dist/icon.png)
+[![Website](https://img.shields.io/badge/Website-bunnywaffle.github.io%2Fpi--desktop-10a37f?style=flat-square)](https://bunnywaffle.github.io/pi-desktop/)
+[![Latest Release](https://img.shields.io/github/v/release/bunnywaffle/pi-desktop?style=flat-square&color=10a37f)](https://github.com/bunnywaffle/pi-desktop/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+
+**[🌐 Visit the Official Website](https://bunnywaffle.github.io/pi-desktop/)** • **[💾 Download Portable Executable](https://github.com/bunnywaffle/pi-desktop/releases/latest)**
 
 Pi Desktop acts as a frontend, session manager, and visual command center around an existing Pi installation. It interfaces directly with Pi via high-performance JSON-RPC mode over standard input/output.
 
