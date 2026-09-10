@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pi Desktop  &mdash;  Modern Desktop GUI for Pi Coding Agent</title>
-  <meta name="description" content="A blazing-fast, aesthetic desktop GUI and control layer for the Pi coding agent. Zero-install portable binary for Windows, multi-provider model routing, and automatic session resumption." />
+  <title>Pi Desktop &mdash; Desktop GUI for Pi Coding Agent</title>
+  <meta name="description" content="A fast, minimalist desktop GUI and control layer for the Pi coding agent. Standalone portable binary for Windows, multi-provider model routing, and automatic session resumption." />
   
   <!-- Open Graph / Social Meta -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://bunnywaffle.github.io/pi-desktop/" />
-  <meta property="og:title" content="Pi Desktop  &mdash;  Modern Desktop GUI for Pi Coding Agent" />
-  <meta property="og:description" content="A blazing-fast, aesthetic desktop GUI and control layer for the Pi coding agent. Zero-install portable binary for Windows, multi-provider model routing, and automatic session resumption." />
+  <meta property="og:title" content="Pi Desktop &mdash; Desktop GUI for Pi Coding Agent" />
+  <meta property="og:description" content="A fast, minimalist desktop GUI and control layer for the Pi coding agent. Standalone portable binary for Windows, multi-provider model routing, and automatic session resumption." />
   <meta property="og:image" content="https://bunnywaffle.github.io/pi-desktop/icon.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Pi Desktop  &mdash;  GUI for Pi Coding Agent" />
-  <meta name="twitter:description" content="Modern desktop interface for Pi coding agent with session resumption, multi-model routing, and portable binary." />
+  <meta name="twitter:title" content="Pi Desktop &mdash; GUI for Pi Coding Agent" />
+  <meta name="twitter:description" content="Minimalist desktop interface for Pi coding agent with session resumption, multi-model routing, and portable binary." />
   <meta name="twitter:image" content="https://bunnywaffle.github.io/pi-desktop/icon.png" />
 
   <!-- Favicon -->
@@ -25,7 +25,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -34,36 +34,17 @@
       darkMode: 'class',
       theme: {
         extend: {
-          colors: {
-            brand: {
-              DEFAULT: '#10a37f',
-              hover: '#0d8a6a',
-              light: '#34d399',
-              dark: '#064e3b'
-            },
-            obsidian: {
-              950: '#09090b',
-              900: '#111114',
-              850: '#16161a',
-              800: '#1c1c22',
-              750: '#24242c',
-              700: '#2d2d38',
-              600: '#3f3f4e',
-              500: '#717184',
-              400: '#9e9eb0',
-              300: '#c5c5d3',
-              200: '#e4e4ed',
-              100: '#f4f4f8'
-            }
-          },
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace']
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
           },
-          boxShadow: {
-            'glow-emerald': '0 0 50px -10px rgba(16, 163, 127, 0.25)',
-            'glow-card': '0 10px 40px -15px rgba(0, 0, 0, 0.7)',
-            'glow-window': '0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 40px -10px rgba(16, 163, 127, 0.15)'
+          colors: {
+            surface: {
+              DEFAULT: '#09090b',
+              50: '#18181b',
+              100: '#121214',
+              200: '#0d0d0f'
+            }
           }
         }
       }
@@ -73,769 +54,640 @@
   <style>
     body {
       background-color: #09090b;
-      color: #e4e4ed;
+      color: #d4d4d8;
       font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
-    .grid-bg {
-      background-size: 40px 40px;
+    .grid-subtle {
+      background-size: 32px 32px;
       background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
     }
-    .glass-card {
-      background: rgba(17, 17, 20, 0.75);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    .panel {
+      background-color: #111113;
+      border: 1px solid rgba(255, 255, 255, 0.07);
     }
-    .glass-card:hover {
-      border-color: rgba(16, 163, 127, 0.35);
+    .panel:hover {
+      border-color: rgba(255, 255, 255, 0.15);
     }
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     ::-webkit-scrollbar-track {
       background: #09090b;
     }
     ::-webkit-scrollbar-thumb {
-      background: #24242c;
-      border-radius: 9999px;
+      background: #27272a;
+      border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #3f3f4e;
+      background: #3f3f46;
     }
   </style>
 </head>
-<body class="selection:bg-brand/30 selection:text-white relative overflow-x-hidden min-h-screen">
+<body class="selection:bg-zinc-800 selection:text-white relative overflow-x-hidden min-h-screen">
 
-  <!-- Ambient Glow Gradients -->
-  <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand/15 blur-[130px] rounded-full"></div>
-    <div class="absolute top-[600px] -left-40 w-[600px] h-[450px] bg-cyan-600/10 blur-[140px] rounded-full"></div>
-    <div class="absolute top-[1200px] -right-40 w-[650px] h-[500px] bg-emerald-700/10 blur-[150px] rounded-full"></div>
-  </div>
+  <!-- Subtle Structural Grid (No glow blurs) -->
+  <div class="pointer-events-none fixed inset-0 -z-10 grid-subtle"></div>
 
-  <!-- Subtle Grid Texture -->
-  <div class="pointer-events-none fixed inset-0 -z-20 grid-bg opacity-70"></div>
-
-  <!-- Sticky Navbar -->
-  <header class="sticky top-0 z-50 border-b border-white/5 bg-obsidian-950/80 backdrop-blur-xl">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <!-- Logo & Brand -->
-      <a href="#" class="flex items-center gap-3 group">
-        <div class="w-9 h-9 rounded-xl bg-obsidian-900 border border-white/10 p-1 flex items-center justify-center group-hover:border-brand/50 transition duration-300 shadow-md">
-          <svg class="w-6 h-6" viewBox="0 0 800 800" fill="none">
-            <rect width="800" height="800" rx="120" fill="#09090b"/>
-            <path fill="#fff" fill-rule="evenodd" d="M165.29 165.29 H517.36 V400 H400 V517.36 H282.65 V634.72 H165.29 Z M282.65 282.65 V400 H400 V282.65 Z"/>
-            <path fill="#fff" d="M517.36 400 H634.72 V634.72 H517.36 Z"/>
-          </svg>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="font-bold text-white tracking-tight text-lg">Pi Desktop</span>
-          <span id="nav-version" class="text-[11px] font-mono font-medium px-2 py-0.5 rounded-full bg-brand/10 border border-brand/20 text-brand-light">v1.0.6</span>
-        </div>
-      </a>
-
-      <!-- Desktop Nav Links -->
-      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-obsidian-400">
-        <a href="#features" class="hover:text-white transition">Features</a>
-        <a href="#showcase" class="hover:text-white transition">Interactive Demo</a>
-        <a href="#architecture" class="hover:text-white transition">Architecture</a>
-        <a href="#comparison" class="hover:text-white transition">Comparison</a>
-        <a href="#download" class="hover:text-white transition">Download</a>
-      </nav>
-
-      <!-- Action Buttons -->
-      <div class="flex items-center gap-3">
-        <a href="https://github.com/bunnywaffle/pi-desktop" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-lg border border-white/10 bg-obsidian-900/90 hover:bg-obsidian-850 hover:border-white/20 text-xs font-medium text-obsidian-300 transition">
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
-          </svg>
-          <span>GitHub</span>
-          <span id="github-stars" class="px-1.5 py-0.5 rounded bg-obsidian-800 text-[10px] text-obsidian-300 font-mono">Star</span>
-        </a>
-
-        <a href="#download" class="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-brand hover:bg-brand-hover text-obsidian-950 font-semibold text-xs transition duration-200 shadow-md shadow-brand/20">
-          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-            <path d="M12 16l4-5h-3V4h-2v7H8l4 5zm9 2H3v2h18v-2z"/>
-          </svg>
-          <span>Get Pi Desktop</span>
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <!-- Hero Section -->
-  <section class="relative pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      
-      <!-- Announcement Pill -->
-      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand/30 bg-brand/10 text-xs text-brand-light mb-8 backdrop-blur-md">
-        <span class="flex h-2 w-2 rounded-full bg-brand animate-pulse"></span>
-        <span class="font-medium">v1.0.6 Out Now</span>
-        <span class="text-obsidian-500">&bull;</span>
-        <span class="text-obsidian-300">Official Brand Mark & Persistent Sessions</span>
-        <a href="https://github.com/bunnywaffle/pi-desktop/releases/tag/v1.0.6" target="_blank" class="text-white hover:underline flex items-center gap-1 font-semibold ml-1">
-          Release Notes
-          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        </a>
-      </div>
-
-      <!-- Main Headline -->
-      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-6 leading-[1.1]">
-        The Native Desktop GUI for <br class="hidden sm:inline" />
-        <span class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
-          Pi Coding Agent
-        </span>
-      </h1>
-
-      <!-- Subtitle -->
-      <p class="max-w-2xl mx-auto text-base sm:text-lg text-obsidian-400 font-normal leading-relaxed mb-10">
-        Transform the CLI coding agent into an aesthetic, responsive desktop workstation. Multi-model routing with strict provider filtering, auto-healing RPC bridge, instant session resumption, and zero-install portability.
-      </p>
-
-      <!-- CTA Buttons -->
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
-        <!-- Download Portable EXE -->
-        <a id="hero-download-btn" href="https://github.com/bunnywaffle/pi-desktop/releases/download/v1.0.6/Pi.Desktop-Portable.exe" class="w-full sm:w-auto flex items-center justify-center gap-3 px-7 py-3.5 rounded-xl bg-gradient-to-r from-brand to-emerald-500 hover:from-brand-hover hover:to-emerald-600 text-obsidian-950 font-bold text-sm transition duration-300 shadow-glow-emerald">
-          <!-- Windows Icon -->
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
-          </svg>
-          <div class="text-left">
-            <div>Download for Windows</div>
-            <div class="text-[10px] opacity-85 font-mono font-medium">Portable .exe &bull; Zero Install &bull; 74 MB</div>
-          </div>
-        </a>
-
-        <!-- View Source on GitHub -->
-        <a href="https://github.com/bunnywaffle/pi-desktop" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl border border-white/10 bg-obsidian-900/90 hover:bg-obsidian-850 hover:border-white/20 text-sm font-semibold text-white transition duration-200">
-          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
-          </svg>
-          <span>Star on GitHub</span>
-        </a>
-      </div>
-
-      <!-- Quick Command Snippet -->
-      <div class="inline-flex items-center gap-2 p-1.5 pl-3.5 pr-2 rounded-xl border border-white/10 bg-obsidian-900/80 text-xs font-mono text-obsidian-300 shadow-inner">
-        <span class="text-brand font-semibold">$</span>
-        <span id="quick-cmd">npm install -g @earendil-works/pi-coding-agent</span>
-        <button onclick="copyToClipboard('npm install -g @earendil-works/pi-coding-agent', this)" class="p-1.5 hover:bg-obsidian-800 rounded-lg text-obsidian-400 hover:text-white transition" title="Copy command">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-        </button>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- Interactive Desktop Window Showcase -->
-  <section id="showcase" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-28">
-    <div class="text-center mb-8">
-      <h2 class="text-xs font-semibold uppercase tracking-widest text-brand mb-2">Interactive Preview</h2>
-      <p class="text-2xl font-bold text-white">Experience the Interface Right Here</p>
-      <p class="text-sm text-obsidian-400 mt-1">Switch between tabs below to explore the desktop environment.</p>
-    </div>
-
-    <!-- Window Wrapper -->
-    <div class="rounded-2xl border border-white/10 bg-obsidian-900/90 shadow-glow-window overflow-hidden transition duration-300">
-      
-      <!-- Window Titlebar -->
-      <div class="h-11 bg-obsidian-950 border-b border-white/10 flex items-center justify-between px-4 text-xs select-none">
-        <div class="flex items-center gap-3">
-          <!-- Window Controls (mac / win aesthetic) -->
-          <div class="flex items-center gap-1.5 mr-2">
-            <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
-            <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
-            <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
-          </div>
-
-          <!-- App Brand Pill -->
-          <div class="flex items-center gap-2 px-2.5 py-1 rounded bg-obsidian-900 border border-white/10 text-white font-semibold">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 800 800" fill="none">
-              <rect width="800" height="800" rx="120" fill="#09090b"/>
-              <path fill="#fff" fill-rule="evenodd" d="M165.29 165.29 H517.36 V400 H400 V517.36 H282.65 V634.72 H165.29 Z M282.65 282.65 V400 H400 V282.65 Z"/>
-              <path fill="#fff" d="M517.36 400 H634.72 V634.72 H517.36 Z"/>
-            </svg>
-            <span>Pi Desktop</span>
-            <span class="text-[10px] text-obsidian-500 font-mono">v1.0.6</span>
-          </div>
-
-          <!-- Interactive Tabs -->
-          <div class="hidden sm:flex items-center gap-1 text-xs">
-            <button onclick="switchTab('chat')" id="tab-btn-chat" class="px-3 py-1 rounded-md bg-obsidian-800 text-white font-medium transition">Chat</button>
-            <button onclick="switchTab('models')" id="tab-btn-models" class="px-3 py-1 rounded-md hover:bg-obsidian-800/60 text-obsidian-400 hover:text-white font-medium transition">Model Switcher</button>
-            <button onclick="switchTab('sessions')" id="tab-btn-sessions" class="px-3 py-1 rounded-md hover:bg-obsidian-800/60 text-obsidian-400 hover:text-white font-medium transition">Saved Sessions</button>
-            <button onclick="switchTab('packages')" id="tab-btn-packages" class="px-3 py-1 rounded-md hover:bg-obsidian-800/60 text-obsidian-400 hover:text-white font-medium transition">Package Hub</button>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2 text-obsidian-400 font-mono text-[11px]">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          <span class="text-emerald-400 font-medium">RPC Connected</span>
-        </div>
-      </div>
-
-      <!-- View 1: Chat View (Default) -->
-      <div id="view-chat" class="flex flex-col md:flex-row h-[500px]">
-        <!-- Sidebar -->
-        <div class="w-full md:w-60 border-b md:border-b-0 md:border-r border-white/5 bg-obsidian-950/70 p-3 flex flex-col justify-between text-xs">
-          <div class="space-y-4">
-            <div>
-              <span class="text-[10px] font-mono text-obsidian-500 uppercase tracking-wider block mb-1">Active Project</span>
-              <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-obsidian-900 border border-white/5 text-white font-medium">
-                <svg class="w-3.5 h-3.5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
-                <span class="truncate">pi-desktop</span>
-              </div>
-            </div>
-
-            <div class="space-y-1">
-              <span class="text-[10px] font-mono text-obsidian-500 uppercase tracking-wider block mb-1">Recent Sessions</span>
-              <div class="px-2.5 py-1.5 rounded-lg bg-brand/10 border border-brand/30 text-white font-medium flex items-center justify-between">
-                <span class="truncate">Refactor RPC & IPC</span>
-                <span class="text-[9px] font-mono text-brand-light">ACTIVE</span>
-              </div>
-              <div class="px-2.5 py-1.5 rounded-lg hover:bg-obsidian-850 text-obsidian-400 hover:text-white transition flex items-center justify-between cursor-pointer">
-                <span class="truncate">Add Provider Filter</span>
-                <span class="text-[9px] font-mono text-obsidian-600">2h ago</span>
-              </div>
-              <div class="px-2.5 py-1.5 rounded-lg hover:bg-obsidian-850 text-obsidian-400 hover:text-white transition flex items-center justify-between cursor-pointer">
-                <span class="truncate">Official Pi Branding</span>
-                <span class="text-[9px] font-mono text-obsidian-600">Yesterday</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="pt-3 border-t border-white/5 text-[11px] text-obsidian-500 flex items-center justify-between">
-            <span>Global Path: /pi</span>
-            <span class="text-emerald-400">Ready</span>
-          </div>
-        </div>
-
-        <!-- Chat Area -->
-        <div class="flex-1 flex flex-col justify-between bg-obsidian-900/60 p-4 sm:p-6 overflow-y-auto">
-          <div class="space-y-5">
-            <!-- User Message -->
-            <div class="flex items-start gap-3 max-w-xl">
-              <div class="w-7 h-7 rounded-lg bg-brand/20 border border-brand/40 text-brand-light flex items-center justify-center font-bold text-xs">U</div>
-              <div class="bg-obsidian-800/80 border border-white/5 rounded-2xl rounded-tl-none p-3.5 text-xs text-obsidian-200">
-                How does the auto-healing JSON-RPC bridge ensure continuous session state?
-              </div>
-            </div>
-
-            <!-- Pi Agent Response -->
-            <div class="flex items-start gap-3 max-w-2xl">
-              <div class="w-7 h-7 rounded-lg bg-obsidian-950 border border-white/10 p-1 flex items-center justify-center shrink-0">
-                <svg class="w-full h-full" viewBox="0 0 800 800" fill="none">
-                  <rect width="800" height="800" rx="120" fill="#09090b"/>
-                  <path fill="#fff" fill-rule="evenodd" d="M165.29 165.29 H517.36 V400 H400 V517.36 H282.65 V634.72 H165.29 Z M282.65 282.65 V400 H400 V282.65 Z"/>
-                  <path fill="#fff" d="M517.36 400 H634.72 V634.72 H517.36 Z"/>
-                </svg>
-              </div>
-              <div class="bg-obsidian-950/80 border border-white/10 rounded-2xl rounded-tl-none p-4 text-xs space-y-2.5">
-                <div class="flex items-center gap-2 pb-2 border-b border-white/5 text-[10px] font-mono text-obsidian-400">
-                  <span class="text-brand font-semibold">claude-3-5-sonnet-20241022</span>
-                  <span>&bull;</span>
-                  <span>Thinking: High</span>
-                  <span>&bull;</span>
-                  <span class="text-emerald-400">128ms latency</span>
-                </div>
-                <p class="text-obsidian-200 leading-relaxed">
-                  Pi Desktop spawns the core <code class="px-1.5 py-0.5 rounded bg-obsidian-800 text-brand-light font-mono text-[11px]">pi --mode rpc</code> process over buffered <code class="px-1.5 py-0.5 rounded bg-obsidian-800 font-mono text-[11px]">stdin / stdout</code>. If the daemon unexpectedly terminates:
-                </p>
-                <!-- Tool Call Pill -->
-                <div class="p-2 rounded-lg bg-obsidian-900 border border-white/5 font-mono text-[11px] text-obsidian-300 flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-                    <span>Tool call: <span class="text-cyan-300">piRpc.recoverSession()</span></span>
-                  </div>
-                  <span class="text-[9px] text-obsidian-500 font-sans">auto-healed</span>
-                </div>
-                <!-- Code Block -->
-                <div class="rounded-lg bg-obsidian-900 border border-white/5 p-2.5 font-mono text-[11px] text-emerald-300 overflow-x-auto">
-                  // Transparent state restoration without message loss<br/>
-                  await this.switchSession(savedSessionFile);
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bottom Chat Input Dock -->
-          <div class="mt-4 pt-3 border-t border-white/5">
-            <div class="flex items-center justify-between text-[11px] text-obsidian-400 mb-1.5 px-1">
-              <div class="flex items-center gap-2">
-                <span class="font-medium text-white">Model:</span>
-                <span class="px-2 py-0.5 rounded bg-obsidian-800 text-brand-light font-mono">claude-3-5-sonnet</span>
-              </div>
-              <span class="font-mono text-[10px] text-obsidian-500">Ctrl+Enter to send</span>
-            </div>
-            <div class="relative flex items-center">
-              <input type="text" readonly value="Inspect recent changes and verify test suite..." class="w-full bg-obsidian-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-obsidian-300 focus:outline-none focus:border-brand">
-              <button class="absolute right-2 px-3 py-1 rounded-lg bg-brand text-obsidian-950 font-bold text-xs">Send</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- View 2: Model Switcher -->
-      <div id="view-models" class="hidden h-[500px] p-6 bg-obsidian-900/60 overflow-y-auto">
-        <div class="max-w-3xl mx-auto space-y-4">
-          <div class="flex items-center justify-between border-b border-white/10 pb-3">
-            <div>
-              <h3 class="text-base font-bold text-white">Provider-Aware Model Switcher</h3>
-              <p class="text-xs text-obsidian-400">Switch models, configure custom APIs, and set default thinking levels.</p>
-            </div>
-            <div class="flex items-center gap-1.5 text-xs">
-              <span class="px-2.5 py-1 rounded-md bg-brand/20 text-brand-light font-medium">All Providers</span>
-              <span class="px-2.5 py-1 rounded-md bg-obsidian-800 text-obsidian-400">Anthropic</span>
-              <span class="px-2.5 py-1 rounded-md bg-obsidian-800 text-obsidian-400">OpenAI</span>
-              <span class="px-2.5 py-1 rounded-md bg-obsidian-800 text-obsidian-400">Custom API</span>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <!-- Model 1 -->
-            <div class="p-3.5 rounded-xl border border-brand/40 bg-brand/5 space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="font-mono font-bold text-xs text-white">claude-3-5-sonnet-20241022</span>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand/20 text-brand-light">ACTIVE</span>
-              </div>
-              <div class="flex items-center gap-2 text-[11px] text-obsidian-400">
-                <span class="px-1.5 py-0.5 rounded bg-obsidian-800 text-obsidian-300">Anthropic</span>
-                <span>&bull;</span>
-                <span>200k Context</span>
-                <span>&bull;</span>
-                <span>Reasoning Support</span>
-              </div>
-            </div>
-            <!-- Model 2 -->
-            <div class="p-3.5 rounded-xl border border-white/5 bg-obsidian-950/60 hover:border-white/20 transition space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="font-mono font-bold text-xs text-white">gpt-4o</span>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-obsidian-800 text-obsidian-400">SELECT</span>
-              </div>
-              <div class="flex items-center gap-2 text-[11px] text-obsidian-400">
-                <span class="px-1.5 py-0.5 rounded bg-obsidian-800 text-obsidian-300">OpenAI</span>
-                <span>&bull;</span>
-                <span>128k Context</span>
-                <span>&bull;</span>
-                <span>Vision Enabled</span>
-              </div>
-            </div>
-            <!-- Model 3 -->
-            <div class="p-3.5 rounded-xl border border-white/5 bg-obsidian-950/60 hover:border-white/20 transition space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="font-mono font-bold text-xs text-white">gemini-1.5-pro</span>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-obsidian-800 text-obsidian-400">SELECT</span>
-              </div>
-              <div class="flex items-center gap-2 text-[11px] text-obsidian-400">
-                <span class="px-1.5 py-0.5 rounded bg-obsidian-800 text-obsidian-300">Google Gemini</span>
-                <span>&bull;</span>
-                <span>2M Context</span>
-                <span>&bull;</span>
-                <span>Deep Multimodal</span>
-              </div>
-            </div>
-            <!-- Model 4 -->
-            <div class="p-3.5 rounded-xl border border-white/5 bg-obsidian-950/60 hover:border-white/20 transition space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="font-mono font-bold text-xs text-white">qwen2.5-coder:32b</span>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-obsidian-800 text-obsidian-400">SELECT</span>
-              </div>
-              <div class="flex items-center gap-2 text-[11px] text-obsidian-400">
-                <span class="px-1.5 py-0.5 rounded bg-cyan-900/40 text-cyan-300">Ollama (Local)</span>
-                <span>&bull;</span>
-                <span>32k Context</span>
-                <span>&bull;</span>
-                <span>Zero Cloud Cost</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- View 3: Saved Sessions -->
-      <div id="view-sessions" class="hidden h-[500px] p-6 bg-obsidian-900/60 overflow-y-auto">
-        <div class="max-w-3xl mx-auto space-y-3">
-          <div class="border-b border-white/10 pb-3">
-            <h3 class="text-base font-bold text-white">Session History & Automatic Resumption</h3>
-            <p class="text-xs text-obsidian-400">Every session is backed up in standard .jsonl files. Restore any conversation with exact model parameters.</p>
-          </div>
-
-          <div class="space-y-2 text-xs">
-            <div class="p-3 rounded-xl bg-obsidian-950/80 border border-white/5 flex items-center justify-between">
-              <div>
-                <div class="font-semibold text-white">Refactor RPC & IPC event forwarding</div>
-                <div class="text-[11px] text-obsidian-500 font-mono mt-0.5">24 messages &bull; claude-3-5-sonnet &bull; Updated 5m ago</div>
-              </div>
-              <button class="px-3 py-1 rounded bg-brand text-obsidian-950 font-bold text-xs">Resume</button>
-            </div>
-            <div class="p-3 rounded-xl bg-obsidian-950/80 border border-white/5 flex items-center justify-between">
-              <div>
-                <div class="font-semibold text-white">Design Windows ICO and high-res vector icon</div>
-                <div class="text-[11px] text-obsidian-500 font-mono mt-0.5">18 messages &bull; gpt-4o &bull; Updated 2h ago</div>
-              </div>
-              <button class="px-3 py-1 rounded bg-obsidian-800 hover:bg-obsidian-750 text-white font-medium text-xs">Load</button>
-            </div>
-            <div class="p-3 rounded-xl bg-obsidian-950/80 border border-white/5 flex items-center justify-between">
-              <div>
-                <div class="font-semibold text-white">Initial project scaffolding and Vite configuration</div>
-                <div class="text-[11px] text-obsidian-500 font-mono mt-0.5">42 messages &bull; claude-3-5-sonnet &bull; Updated yesterday</div>
-              </div>
-              <button class="px-3 py-1 rounded bg-obsidian-800 hover:bg-obsidian-750 text-white font-medium text-xs">Load</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- View 4: Packages -->
-      <div id="view-packages" class="hidden h-[500px] p-6 bg-obsidian-900/60 overflow-y-auto">
-        <div class="max-w-3xl mx-auto space-y-4">
-          <div class="flex items-center justify-between border-b border-white/10 pb-3">
-            <div>
-              <h3 class="text-base font-bold text-white">Online Package Catalog</h3>
-              <p class="text-xs text-obsidian-400">Discover and install extensions and skills from <a href="https://pi.dev/packages" target="_blank" class="text-brand-light hover:underline">pi.dev/packages</a>.</p>
-            </div>
-            <span class="px-2.5 py-1 rounded-md bg-obsidian-800 text-xs text-obsidian-300 font-mono">Sync with pi.dev</span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div class="p-3.5 rounded-xl border border-white/5 bg-obsidian-950/60 space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-white">@pi/web-search</span>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-900/40 text-emerald-300">INSTALLED</span>
-              </div>
-              <p class="text-obsidian-400 text-[11px]">Real-time web browsing and documentation retrieval skill.</p>
-            </div>
-            <div class="p-3.5 rounded-xl border border-white/5 bg-obsidian-950/60 space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-white">@pi/docker-tools</span>
-                <button class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand/20 text-brand-light hover:bg-brand/30">INSTALL</button>
-              </div>
-              <p class="text-obsidian-400 text-[11px]">Container management and dockerfile generation extension.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- Core Features Bento Grid -->
-  <section id="features" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/5">
-    <div class="text-center max-w-2xl mx-auto mb-16">
-      <h2 class="text-xs font-semibold uppercase tracking-widest text-brand mb-2">Engineered For Reliability</h2>
-      <h3 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Everything You Need In A Coding Workstation</h3>
-      <p class="text-sm text-obsidian-400 mt-3">Pi Desktop is built from the ground up as a native companion that enhances Pi without getting in the way.</p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      
-      <!-- Card 1: Zero Install Portable -->
-      <div class="glass-card p-6 rounded-2xl transition duration-300 space-y-3">
-        <div class="w-10 h-10 rounded-xl bg-brand/10 border border-brand/20 text-brand flex items-center justify-center">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-        </div>
-        <h4 class="text-base font-bold text-white">Zero-Install Portable Binary</h4>
-        <p class="text-xs text-obsidian-400 leading-relaxed">
-          Distributed as a single standalone executable (<code class="text-brand-light font-mono">Pi Desktop-Portable.exe</code>). No installers, no registry modifications, no administrator privileges required.
-        </p>
-      </div>
-
-      <!-- Card 2: Session & Model Retention -->
-      <div class="glass-card p-6 rounded-2xl transition duration-300 space-y-3">
-        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        </div>
-        <h4 class="text-base font-bold text-white">Full State Persistence</h4>
-        <p class="text-xs text-obsidian-400 leading-relaxed">
-          Close and reopen anytime. The app remembers your last active session, active project directory, selected model, and reasoning effort level across reboots.
-        </p>
-      </div>
-
-      <!-- Card 3: OS Agnostic -->
-      <div class="glass-card p-6 rounded-2xl transition duration-300 space-y-3">
-        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-        </div>
-        <h4 class="text-base font-bold text-white">Auto-Healing RPC Engine</h4>
-        <p class="text-xs text-obsidian-400 leading-relaxed">
-          Detects Pi installations across npm, pnpm, yarn, bun, or PATH. If the process is disrupted, the bridge automatically restarts and reconnects without losing your prompt queue.
-        </p>
-      </div>
-
-      <!-- Card 4: Rich Markdown & Syntax Highlighting -->
-      <div class="glass-card p-6 rounded-2xl transition duration-300 space-y-3">
-        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-        </div>
-        <h4 class="text-base font-bold text-white">GFM Markdown & Code Highlighting</h4>
-        <p class="text-xs text-obsidian-400 leading-relaxed">
-          Stream responses formatted with GitHub Flavored Markdown, Prism.js syntax coloring, one-click code copying, and distinct tool call visualizations.
-        </p>
-      </div>
-
-      <!-- Card 5: Native TUI Interception -->
-      <div class="glass-card p-6 rounded-2xl transition duration-300 space-y-3">
-        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-        </div>
-        <h4 class="text-base font-bold text-white">TUI Question Interception</h4>
-        <p class="text-xs text-obsidian-400 leading-relaxed">
-          Interactive TUI questions and terminal confirmation prompts asked by Pi are transparently routed into smooth graphical dialog modals.
-        </p>
-      </div>
-
-      <!-- Card 6: Custom APIs -->
-      <div class="glass-card p-6 rounded-2xl transition duration-300 space-y-3">
-        <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-        </div>
-        <h4 class="text-base font-bold text-white">Custom OpenAI-Compatible APIs</h4>
-        <p class="text-xs text-obsidian-400 leading-relaxed">
-          Connect local models hosted with Ollama, LM Studio, vLLM, or private corporate endpoints with custom base URLs and headers.
-        </p>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- Architecture Deep-Dive -->
-  <section id="architecture" class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/5">
-    <div class="text-center max-w-2xl mx-auto mb-14">
-      <h2 class="text-xs font-semibold uppercase tracking-widest text-brand mb-2">Clean Separation of Concerns</h2>
-      <h3 class="text-3xl font-extrabold text-white tracking-tight">How Pi Desktop Works</h3>
-      <p class="text-sm text-obsidian-400 mt-2">Pi agent remains the single source of truth for tools, LLMs, and workspace operations.</p>
-    </div>
-
-    <!-- Architecture Diagram Box -->
-    <div class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-        
-        <!-- Layer 1 -->
-        <div class="p-5 rounded-xl bg-obsidian-950/80 border border-white/5 space-y-2">
-          <div class="text-xs font-mono text-brand-light font-bold">1. PRESENTATION LAYER</div>
-          <div class="font-bold text-white text-sm">React 18 + Tailwind UI</div>
-          <p class="text-xs text-obsidian-400">Model browser, chat streams, session management, markdown renderer, and prompt dock.</p>
-        </div>
-
-        <!-- Layer 2 -->
-        <div class="p-5 rounded-xl bg-obsidian-950/80 border border-brand/30 shadow-glow-emerald space-y-2">
-          <div class="text-xs font-mono text-cyan-300 font-bold">2. CONTROL LAYER</div>
-          <div class="font-bold text-white text-sm">Electron 32 IPC & RPC Bridge</div>
-          <p class="text-xs text-obsidian-400">Lifecycle supervisor, JSON-RPC streaming over stdin/stdout, auto-reconnect, TUI dialog interceptor.</p>
-        </div>
-
-        <!-- Layer 3 -->
-        <div class="p-5 rounded-xl bg-obsidian-950/80 border border-white/5 space-y-2">
-          <div class="text-xs font-mono text-purple-300 font-bold">3. AGENT ENGINE</div>
-          <div class="font-bold text-white text-sm">Pi Coding Agent CLI</div>
-          <p class="text-xs text-obsidian-400">Official agent execution engine by Earendil Works. Autonomous tool calls, multi-model execution, session JSONL files.</p>
-        </div>
-
-      </div>
-
-      <div class="pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-obsidian-400 gap-3">
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>Zero monkey-patching: fully compatible with future upstream updates to <code class="text-brand-light font-mono">pi</code>.</span>
-        </div>
-        <a href="https://pi.dev" target="_blank" class="text-brand hover:underline flex items-center gap-1 font-semibold">
-          Learn about Pi Agent on pi.dev &rarr;
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Comparison Table -->
-  <section id="comparison" class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/5">
-    <div class="text-center max-w-2xl mx-auto mb-14">
-      <h2 class="text-xs font-semibold uppercase tracking-widest text-brand mb-2">Side by Side</h2>
-      <h3 class="text-3xl font-extrabold text-white tracking-tight">CLI Experience vs Pi Desktop</h3>
-    </div>
-
-    <div class="overflow-x-auto">
-      <table class="w-full text-left text-xs border-collapse">
-        <thead>
-          <tr class="border-b border-white/10 text-obsidian-400 uppercase tracking-wider font-mono">
-            <th class="py-3 px-4">Feature</th>
-            <th class="py-3 px-4">Pi CLI</th>
-            <th class="py-3 px-4 text-brand-light font-bold">Pi Desktop</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-white/5 text-obsidian-300">
-          <tr class="hover:bg-white/[0.02]">
-            <td class="py-3.5 px-4 font-medium text-white">Installation</td>
-            <td class="py-3.5 px-4 text-obsidian-400">Requires Node.js runtime & global npm install</td>
-            <td class="py-3.5 px-4 text-emerald-400 font-semibold">Portable zero-install .exe or standard npm</td>
-          </tr>
-          <tr class="hover:bg-white/[0.02]">
-            <td class="py-3.5 px-4 font-medium text-white">Model Selection</td>
-            <td class="py-3.5 px-4 text-obsidian-400">Command flags or text menu cycling</td>
-            <td class="py-3.5 px-4 text-emerald-400 font-semibold">Searchable, provider-filtered graphical selector</td>
-          </tr>
-          <tr class="hover:bg-white/[0.02]">
-            <td class="py-3.5 px-4 font-medium text-white">Session History</td>
-            <td class="py-3.5 px-4 text-obsidian-400">Manual navigation of .jsonl files</td>
-            <td class="py-3.5 px-4 text-emerald-400 font-semibold">One-click resume with timestamps & message preview</td>
-          </tr>
-          <tr class="hover:bg-white/[0.02]">
-            <td class="py-3.5 px-4 font-medium text-white">Code Highlighting & Copy</td>
-            <td class="py-3.5 px-4 text-obsidian-400">Terminal ANSI colors</td>
-            <td class="py-3.5 px-4 text-emerald-400 font-semibold">Prism syntax highlighting with 1-click copy buttons</td>
-          </tr>
-          <tr class="hover:bg-white/[0.02]">
-            <td class="py-3.5 px-4 font-medium text-white">Interactive Questions</td>
-            <td class="py-3.5 px-4 text-obsidian-400">Raw terminal prompts</td>
-            <td class="py-3.5 px-4 text-emerald-400 font-semibold">Clean native modal dialogs</td>
-          </tr>
-          <tr class="hover:bg-white/[0.02]">
-            <td class="py-3.5 px-4 font-medium text-white">State on App Restart</td>
-            <td class="py-3.5 px-4 text-obsidian-400">Resets to default startup parameters</td>
-            <td class="py-3.5 px-4 text-emerald-400 font-semibold">Remembers active model, thinking effort & session</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- Download & Installation Section -->
-  <section id="download" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 border-t border-white/5">
-    <div class="text-center max-w-2xl mx-auto mb-16">
-      <h2 class="text-xs font-semibold uppercase tracking-widest text-brand mb-2">Get Started</h2>
-      <h3 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Download Pi Desktop Today</h3>
-      <p class="text-sm text-obsidian-400 mt-2">Pick your preferred method: standalone portable executable or build from source.</p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      
-      <!-- Option 1: Standalone Portable Binary (Recommended) -->
-      <div class="glass-card p-8 rounded-2xl border-brand/30 shadow-glow-emerald flex flex-col justify-between space-y-6 relative overflow-hidden">
-        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-brand/10 rounded-full blur-2xl"></div>
-
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <span class="px-3 py-1 rounded-full bg-brand/20 border border-brand/30 text-brand-light font-bold text-xs">RECOMMENDED</span>
-            <span id="card-version" class="text-xs font-mono text-obsidian-400">v1.0.6</span>
-          </div>
-
-          <h4 class="text-2xl font-bold text-white">Windows Portable Executable</h4>
-          <p class="text-xs text-obsidian-300 leading-relaxed">
-            Instant zero-install binary. Includes embedded Electron runtime, React frontend, and RPC process controller. Just download and run.
-          </p>
-
-          <div class="space-y-2 py-2 text-xs text-obsidian-400">
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-              <span>Windows 10 / 11 (x64) compatible</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-              <span>Official Pi icon embedded in executable</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-              <span>Self-contained &bull; No administrative rights required</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="space-y-3 pt-4 border-t border-white/10">
-          <a href="https://github.com/bunnywaffle/pi-desktop/releases/download/v1.0.6/Pi.Desktop-Portable.exe" class="w-full flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-xl bg-brand hover:bg-brand-hover text-obsidian-950 font-bold text-sm transition duration-200 shadow-md">
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 16l4-5h-3V4h-2v7H8l4 5zm9 2H3v2h18v-2z"/></svg>
-            <span>Download Pi Desktop-Portable.exe</span>
-          </a>
-          <div class="text-center">
-            <a href="https://github.com/bunnywaffle/pi-desktop/releases" target="_blank" class="text-[11px] text-obsidian-400 hover:text-white transition">
-              View all release assets and changelogs &rarr;
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Option 2: Build from Source -->
-      <div class="glass-card p-8 rounded-2xl flex flex-col justify-between space-y-6">
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <span class="px-3 py-1 rounded-full bg-obsidian-800 text-obsidian-300 font-bold text-xs">DEVELOPERS</span>
-            <span class="text-xs font-mono text-obsidian-500">Cross-Platform</span>
-          </div>
-
-          <h4 class="text-2xl font-bold text-white">Build from Source</h4>
-          <p class="text-xs text-obsidian-400 leading-relaxed">
-            Run the latest codebase or customize the React components. Suitable for Windows, macOS, and Linux developers.
-          </p>
-
-          <!-- Source code terminal box -->
-          <div class="rounded-xl bg-obsidian-950 border border-white/10 p-3.5 space-y-2 font-mono text-xs text-obsidian-300">
-            <div class="text-obsidian-500 text-[10px]"># 1. Clone repository</div>
-            <div class="flex items-center justify-between">
-              <span class="truncate">git clone https://github.com/bunnywaffle/pi-desktop.git</span>
-            </div>
-
-            <div class="text-obsidian-500 text-[10px] pt-1"># 2. Install dependencies</div>
-            <div class="flex items-center justify-between">
-              <span>cd pi-desktop && npm install</span>
-            </div>
-
-            <div class="text-obsidian-500 text-[10px] pt-1"># 3. Launch in development</div>
-            <div class="flex items-center justify-between">
-              <span class="text-brand-light">npm run dev</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="space-y-3 pt-4 border-t border-white/10">
-          <a href="https://github.com/bunnywaffle/pi-desktop" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-xl border border-white/10 bg-obsidian-850 hover:bg-obsidian-800 text-white font-semibold text-sm transition duration-200">
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-            <span>Explore Code on GitHub</span>
-          </a>
-          <div class="text-center">
-            <span class="text-[11px] text-obsidian-500">Open source under the MIT License</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="border-t border-white/5 bg-obsidian-950/90 py-12 text-xs text-obsidian-400">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-      
-      <div class="flex items-center gap-3">
-        <div class="w-7 h-7 rounded-lg bg-obsidian-900 border border-white/10 p-1 flex items-center justify-center">
+  <!-- Minimalist Navigation Bar -->
+  <header class="sticky top-0 z-50 border-b border-white/[0.06] bg-[#09090b]/90 backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+      <!-- Brand -->
+      <a href="#" class="flex items-center gap-2.5 group">
+        <div class="w-7 h-7 rounded-lg bg-zinc-900 border border-white/10 p-1 flex items-center justify-center transition group-hover:border-white/30">
           <svg class="w-full h-full" viewBox="0 0 800 800" fill="none">
             <rect width="800" height="800" rx="120" fill="#09090b"/>
             <path fill="#fff" fill-rule="evenodd" d="M165.29 165.29 H517.36 V400 H400 V517.36 H282.65 V634.72 H165.29 Z M282.65 282.65 V400 H400 V282.65 Z"/>
             <path fill="#fff" d="M517.36 400 H634.72 V634.72 H517.36 Z"/>
           </svg>
         </div>
-        <div>
-          <div class="font-bold text-white">Pi Desktop</div>
-          <div class="text-[11px] text-obsidian-500">Desktop control layer for the Pi Coding Agent</div>
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-white tracking-tight text-sm">Pi Desktop</span>
+          <span id="nav-version" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">v1.0.6</span>
+        </div>
+      </a>
+
+      <!-- Center Links -->
+      <nav class="hidden md:flex items-center gap-7 text-xs font-medium text-zinc-400">
+        <a href="#preview" class="hover:text-white transition">Preview</a>
+        <a href="#features" class="hover:text-white transition">Features</a>
+        <a href="#architecture" class="hover:text-white transition">Architecture</a>
+        <a href="#comparison" class="hover:text-white transition">Comparison</a>
+        <a href="#download" class="hover:text-white transition">Download</a>
+      </nav>
+
+      <!-- Right Actions -->
+      <div class="flex items-center gap-3">
+        <a href="https://github.com/bunnywaffle/pi-desktop" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-zinc-800 bg-zinc-900 hover:border-zinc-700 text-xs text-zinc-300 transition">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span class="font-mono text-[11px]" id="github-stars">GitHub</span>
+        </a>
+
+        <a href="#download" class="px-3 py-1 rounded-md bg-white text-black font-semibold text-xs hover:bg-zinc-200 transition">
+          Download
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="max-w-4xl mx-auto px-4 sm:px-6 pt-16 pb-14 text-center">
+    
+    <!-- Understated Pill -->
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-800 bg-zinc-900/80 text-xs text-zinc-300 mb-8">
+      <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
+      <span class="font-mono text-[11px]">v1.0.6 Release</span>
+      <span class="text-zinc-600">&bull;</span>
+      <span class="text-zinc-400">Official Brand Mark &amp; Persistent Sessions</span>
+    </div>
+
+    <!-- Stark Crisp Typography -->
+    <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-white mb-5 leading-tight">
+      Desktop Control Layer for<br />
+      Pi Coding Agent
+    </h1>
+
+    <p class="max-w-xl mx-auto text-sm sm:text-base text-zinc-400 leading-relaxed mb-8">
+      A fast, focused desktop workstation for Pi. Strict provider-filtered model switching, auto-healing JSON-RPC bridge, session resumption, and zero-install portability.
+    </p>
+
+    <!-- Clean Monochrome Actions -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
+      <a id="hero-download-btn" href="https://github.com/bunnywaffle/pi-desktop/releases/download/v1.0.6/Pi.Desktop-Portable.exe" class="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold text-xs transition">
+        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+          <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+        </svg>
+        <span>Download for Windows (Portable .exe)</span>
+      </a>
+
+      <a href="https://github.com/bunnywaffle/pi-desktop" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-zinc-800 bg-zinc-900 hover:border-zinc-700 text-zinc-200 text-xs font-medium transition">
+        <span>View Source</span>
+      </a>
+    </div>
+
+    <!-- Terminal Command Snippet -->
+    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-800/80 bg-zinc-900/70 text-xs font-mono text-zinc-300">
+      <span class="text-zinc-500">$</span>
+      <span>npm install -g @earendil-works/pi-coding-agent</span>
+      <button onclick="copyToClipboard('npm install -g @earendil-works/pi-coding-agent', this)" class="p-1 hover:text-white text-zinc-500 transition" title="Copy command">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+      </button>
+    </div>
+
+  </section>
+
+  <!-- Interactive Desktop Window Showcase -->
+  <section id="preview" class="max-w-5xl mx-auto px-4 sm:px-6 pb-20">
+    <div class="rounded-xl border border-white/10 bg-[#0f0f11] shadow-2xl overflow-hidden">
+      
+      <!-- Window Titlebar -->
+      <div class="h-10 bg-[#0a0a0c] border-b border-white/[0.06] flex items-center justify-between px-3.5 text-xs select-none">
+        <div class="flex items-center gap-3">
+          <!-- Window Controls -->
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-zinc-700 inline-block"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-zinc-700 inline-block"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-zinc-700 inline-block"></span>
+          </div>
+
+          <!-- App Brand Pill -->
+          <div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-white font-medium text-[11px]">
+            <svg class="w-3 h-3" viewBox="0 0 800 800" fill="none">
+              <rect width="800" height="800" rx="120" fill="#09090b"/>
+              <path fill="#fff" fill-rule="evenodd" d="M165.29 165.29 H517.36 V400 H400 V517.36 H282.65 V634.72 H165.29 Z M282.65 282.65 V400 H400 V282.65 Z"/>
+              <path fill="#fff" d="M517.36 400 H634.72 V634.72 H517.36 Z"/>
+            </svg>
+            <span>Pi Desktop</span>
+          </div>
+
+          <!-- Interactive Tabs -->
+          <div class="hidden sm:flex items-center gap-1 text-[11px]">
+            <button onclick="switchTab('chat')" id="tab-btn-chat" class="px-2.5 py-0.5 rounded bg-zinc-800 text-white font-medium transition">Chat</button>
+            <button onclick="switchTab('models')" id="tab-btn-models" class="px-2.5 py-0.5 rounded text-zinc-400 hover:text-white transition">Model Switcher</button>
+            <button onclick="switchTab('sessions')" id="tab-btn-sessions" class="px-2.5 py-0.5 rounded text-zinc-400 hover:text-white transition">Saved Sessions</button>
+            <button onclick="switchTab('packages')" id="tab-btn-packages" class="px-2.5 py-0.5 rounded text-zinc-400 hover:text-white transition">Packages</button>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1.5 text-zinc-400 font-mono text-[10px]">
+          <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
+          <span>RPC Ready</span>
         </div>
       </div>
 
-      <div class="flex items-center gap-6 font-medium">
-        <a href="https://github.com/bunnywaffle/pi-desktop" target="_blank" class="hover:text-white transition">GitHub</a>
-        <a href="https://github.com/bunnywaffle/pi-desktop/releases" target="_blank" class="hover:text-white transition">Releases</a>
-        <a href="https://pi.dev" target="_blank" class="hover:text-white transition">pi.dev</a>
-        <a href="https://github.com/bunnywaffle/pi-desktop/blob/main/LICENSE" target="_blank" class="hover:text-white transition">MIT License</a>
+      <!-- Tab 1: Chat View -->
+      <div id="view-chat" class="flex flex-col md:flex-row h-[460px]">
+        <!-- Sidebar -->
+        <div class="w-full md:w-56 border-b md:border-b-0 md:border-r border-white/[0.06] bg-[#0c0c0e] p-3 flex flex-col justify-between text-xs">
+          <div class="space-y-3.5">
+            <div>
+              <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block mb-1">Project</span>
+              <div class="flex items-center gap-2 px-2 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-200 font-mono text-[11px]">
+                <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                <span class="truncate">pi-desktop</span>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block mb-1">Sessions</span>
+              <div class="px-2 py-1 rounded bg-zinc-800 text-white text-[11px] font-medium flex items-center justify-between">
+                <span class="truncate">Refactor RPC & IPC</span>
+                <span class="text-[9px] font-mono text-zinc-400">ACTIVE</span>
+              </div>
+              <div class="px-2 py-1 rounded text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition text-[11px] flex items-center justify-between cursor-pointer">
+                <span class="truncate">Provider Filtering</span>
+                <span class="text-[9px] font-mono text-zinc-600">2h ago</span>
+              </div>
+              <div class="px-2 py-1 rounded text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition text-[11px] flex items-center justify-between cursor-pointer">
+                <span class="truncate">Branding Integration</span>
+                <span class="text-[9px] font-mono text-zinc-600">Yesterday</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2.5 border-t border-white/[0.06] text-[10px] text-zinc-500 font-mono flex items-center justify-between">
+            <span>Global Pi</span>
+            <span class="text-zinc-300">Connected</span>
+          </div>
+        </div>
+
+        <!-- Chat View Area -->
+        <div class="flex-1 flex flex-col justify-between bg-[#111113] p-4 overflow-y-auto">
+          <div class="space-y-4">
+            <!-- User Prompt -->
+            <div class="flex items-start gap-2.5 max-w-xl">
+              <div class="w-6 h-6 rounded bg-zinc-800 text-zinc-300 flex items-center justify-center font-mono text-[10px] font-medium">U</div>
+              <div class="bg-zinc-900 border border-zinc-800/80 rounded-lg p-3 text-xs text-zinc-200">
+                How does the auto-healing JSON-RPC bridge recover if the background agent terminates?
+              </div>
+            </div>
+
+            <!-- Agent Response -->
+            <div class="flex items-start gap-2.5 max-w-2xl">
+              <div class="w-6 h-6 rounded bg-zinc-950 border border-zinc-800 p-0.5 flex items-center justify-center shrink-0">
+                <svg class="w-full h-full" viewBox="0 0 800 800" fill="none">
+                  <rect width="800" height="800" rx="120" fill="#09090b"/>
+                  <path fill="#fff" fill-rule="evenodd" d="M165.29 165.29 H517.36 V400 H400 V517.36 H282.65 V634.72 H165.29 Z M282.65 282.65 V400 H400 V282.65 Z"/>
+                  <path fill="#fff" d="M517.36 400 H634.72 V634.72 H517.36 Z"/>
+                </svg>
+              </div>
+              <div class="bg-zinc-900/90 border border-zinc-800 rounded-lg p-3.5 text-xs space-y-2">
+                <div class="flex items-center gap-2 pb-1.5 border-b border-zinc-800 text-[10px] font-mono text-zinc-400">
+                  <span class="text-white font-medium">claude-3-5-sonnet-20241022</span>
+                  <span>&bull;</span>
+                  <span>Thinking: High</span>
+                </div>
+                <p class="text-zinc-300 leading-relaxed">
+                  The bridge monitors the child process exit events. Upon unexpected disconnection, it auto-spawns a new <code class="px-1 py-0.5 rounded bg-zinc-800 text-white font-mono text-[11px]">pi --mode rpc</code> instance and seamlessly resynchronizes the session:
+                </p>
+                <!-- Tool call indicator -->
+                <div class="px-2.5 py-1.5 rounded bg-zinc-950 border border-zinc-800 font-mono text-[10px] text-zinc-400 flex items-center justify-between">
+                  <span>tool: switch_session(&quot;my-session.jsonl&quot;)</span>
+                  <span class="text-zinc-500">done</span>
+                </div>
+                <!-- Clean Code Block -->
+                <div class="rounded bg-zinc-950 border border-zinc-800 p-2 font-mono text-[11px] text-zinc-300 overflow-x-auto">
+                  await this.rpcProcess.initialize();<br/>
+                  await this.restoreSessionHistory(activeSessionPath);
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Prompt Dock -->
+          <div class="mt-4 pt-2.5 border-t border-white/[0.06]">
+            <div class="flex items-center justify-between text-[10px] font-mono text-zinc-500 mb-1 px-1">
+              <span>Model: claude-3-5-sonnet-20241022</span>
+              <span>Ctrl+Enter to send</span>
+            </div>
+            <div class="relative flex items-center">
+              <input type="text" readonly value="Inspect recent changes and verify test suite..." class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:outline-none">
+              <button class="absolute right-1.5 px-2.5 py-1 rounded bg-white text-black font-semibold text-[11px]">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Model Switcher -->
+      <div id="view-models" class="hidden h-[460px] p-5 bg-[#111113] overflow-y-auto">
+        <div class="max-w-2xl mx-auto space-y-3.5">
+          <div class="flex items-center justify-between border-b border-zinc-800 pb-2.5">
+            <div>
+              <h3 class="text-sm font-semibold text-white">Model Switcher</h3>
+              <p class="text-xs text-zinc-400">Strict provider filtering across Anthropic, OpenAI, Gemini, and local LLMs.</p>
+            </div>
+            <div class="flex items-center gap-1 text-xs">
+              <span class="px-2 py-0.5 rounded bg-zinc-800 text-white text-[11px]">All</span>
+              <span class="px-2 py-0.5 rounded text-zinc-500 text-[11px]">Anthropic</span>
+              <span class="px-2 py-0.5 rounded text-zinc-500 text-[11px]">OpenAI</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div class="p-3 rounded-lg border border-zinc-700 bg-zinc-900 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-mono font-medium text-xs text-white">claude-3-5-sonnet</span>
+                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300">ACTIVE</span>
+              </div>
+              <div class="text-[10px] text-zinc-400 font-mono">Anthropic &bull; 200k context &bull; reasoning</div>
+            </div>
+            <div class="p-3 rounded-lg border border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 transition space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-mono font-medium text-xs text-white">gpt-4o</span>
+                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-950 text-zinc-500">SELECT</span>
+              </div>
+              <div class="text-[10px] text-zinc-400 font-mono">OpenAI &bull; 128k context &bull; vision</div>
+            </div>
+            <div class="p-3 rounded-lg border border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 transition space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-mono font-medium text-xs text-white">gemini-1.5-pro</span>
+                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-950 text-zinc-500">SELECT</span>
+              </div>
+              <div class="text-[10px] text-zinc-400 font-mono">Google &bull; 2M context &bull; multimodal</div>
+            </div>
+            <div class="p-3 rounded-lg border border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 transition space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-mono font-medium text-xs text-white">qwen2.5-coder:32b</span>
+                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-950 text-zinc-500">SELECT</span>
+              </div>
+              <div class="text-[10px] text-zinc-400 font-mono">Ollama &bull; 32k context &bull; local</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Saved Sessions -->
+      <div id="view-sessions" class="hidden h-[460px] p-5 bg-[#111113] overflow-y-auto">
+        <div class="max-w-2xl mx-auto space-y-3">
+          <div class="border-b border-zinc-800 pb-2.5">
+            <h3 class="text-sm font-semibold text-white">Session History</h3>
+            <p class="text-xs text-zinc-400">Restore any saved session file with exact message history and model configuration.</p>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
+              <div>
+                <div class="font-medium text-white text-xs">Refactor RPC &amp; IPC event forwarding</div>
+                <div class="text-[10px] text-zinc-500 font-mono mt-0.5">24 turns &bull; claude-3-5-sonnet &bull; 5m ago</div>
+              </div>
+              <button class="px-2.5 py-1 rounded bg-white text-black font-semibold text-[10px]">Resume</button>
+            </div>
+            <div class="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/80 flex items-center justify-between">
+              <div>
+                <div class="font-medium text-white text-xs">Design Windows ICO and high-res icon</div>
+                <div class="text-[10px] text-zinc-500 font-mono mt-0.5">18 turns &bull; gpt-4o &bull; 2h ago</div>
+              </div>
+              <button class="px-2.5 py-1 rounded bg-zinc-800 text-zinc-300 font-medium text-[10px]">Load</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Packages -->
+      <div id="view-packages" class="hidden h-[460px] p-5 bg-[#111113] overflow-y-auto">
+        <div class="max-w-2xl mx-auto space-y-3.5">
+          <div class="border-b border-zinc-800 pb-2.5">
+            <h3 class="text-sm font-semibold text-white">Package Catalog</h3>
+            <p class="text-xs text-zinc-400">Direct integration with extensions and skills from pi.dev/packages.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+            <div class="p-3 rounded-lg border border-zinc-800 bg-zinc-900/60 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-white text-xs">@pi/web-search</span>
+                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300">INSTALLED</span>
+              </div>
+              <p class="text-zinc-400 text-[11px]">Real-time documentation search and retrieval.</p>
+            </div>
+            <div class="p-3 rounded-lg border border-zinc-800 bg-zinc-900/60 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-white text-xs">@pi/docker-tools</span>
+                <button class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 hover:text-white">INSTALL</button>
+              </div>
+              <p class="text-zinc-400 text-[11px]">Container management and docker generation.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Core Features Grid -->
+  <section id="features" class="max-w-5xl mx-auto px-4 sm:px-6 py-16 border-t border-white/[0.06]">
+    <div class="text-center max-w-xl mx-auto mb-12">
+      <h2 class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Capabilities</h2>
+      <h3 class="text-2xl sm:text-3xl font-bold text-white">Engineered For Focus and Stability</h3>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      
+      <!-- Feature 1 -->
+      <div class="panel p-5 rounded-xl space-y-2.5">
+        <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        </div>
+        <h4 class="text-sm font-semibold text-white">Portable Zero-Install</h4>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Standalone single executable for Windows. Run anywhere with no installation or administrative permissions required.
+        </p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="panel p-5 rounded-xl space-y-2.5">
+        <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <h4 class="text-sm font-semibold text-white">Session &amp; Model Persistence</h4>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Remembers your exact active session, working directory, chosen model, and reasoning effort across app restarts.
+        </p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="panel p-5 rounded-xl space-y-2.5">
+        <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        </div>
+        <h4 class="text-sm font-semibold text-white">Auto-Healing RPC Bridge</h4>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Supervises the background Pi daemon over buffered stdio, auto-recovering connections without dropping your input prompt.
+        </p>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="panel p-5 rounded-xl space-y-2.5">
+        <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+        </div>
+        <h4 class="text-sm font-semibold text-white">Syntax Highlighting &amp; Copy</h4>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          GitHub-Flavored Markdown rendering with Prism syntax highlighting and one-click code block copying.
+        </p>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="panel p-5 rounded-xl space-y-2.5">
+        <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+        </div>
+        <h4 class="text-sm font-semibold text-white">TUI Modal Interception</h4>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Transparently routes interactive CLI questions and confirmation prompts into native desktop dialogs.
+        </p>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="panel p-5 rounded-xl space-y-2.5">
+        <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+        </div>
+        <h4 class="text-sm font-semibold text-white">Custom OpenAI Endpoints</h4>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Connect local Ollama, LM Studio, vLLM, or self-hosted API endpoints with custom URLs and headers.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Clean Architecture Diagram -->
+  <section id="architecture" class="max-w-5xl mx-auto px-4 sm:px-6 py-16 border-t border-white/[0.06]">
+    <div class="text-center max-w-xl mx-auto mb-10">
+      <h2 class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Architecture</h2>
+      <h3 class="text-2xl font-bold text-white">Unmodified Upstream Engine</h3>
+      <p class="text-xs text-zinc-400 mt-1">Pi agent remains the sole source of truth. The GUI operates as an external supervisor.</p>
+    </div>
+
+    <div class="panel rounded-xl p-6 space-y-5">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-left">
+        
+        <div class="p-4 rounded-lg bg-zinc-900 border border-zinc-800/80 space-y-1.5">
+          <div class="text-[10px] font-mono text-zinc-500 uppercase">Layer 1</div>
+          <div class="font-semibold text-white text-xs">Desktop Frontend</div>
+          <p class="text-[11px] text-zinc-400 leading-relaxed">React 18 interface handling chat streams, model search, session management, and settings.</p>
+        </div>
+
+        <div class="p-4 rounded-lg bg-zinc-900 border border-zinc-700 space-y-1.5">
+          <div class="text-[10px] font-mono text-zinc-300 uppercase">Layer 2 &bull; Bridge</div>
+          <div class="font-semibold text-white text-xs">Electron IPC &amp; RPC Supervisor</div>
+          <p class="text-[11px] text-zinc-400 leading-relaxed">Buffered stdin/stdout streaming, process watchdog, auto-restart, and TUI dialog translation.</p>
+        </div>
+
+        <div class="p-4 rounded-lg bg-zinc-900 border border-zinc-800/80 space-y-1.5">
+          <div class="text-[10px] font-mono text-zinc-500 uppercase">Layer 3</div>
+          <div class="font-semibold text-white text-xs">Pi Coding Agent Engine</div>
+          <p class="text-[11px] text-zinc-400 leading-relaxed">Official core agent by Earendil Works. Autonomous tools, model routing, and JSONL sessions.</p>
+        </div>
+
+      </div>
+
+      <div class="pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs text-zinc-400">
+        <span class="font-mono text-[11px]">Upstream compatibility guaranteed with future Pi versions.</span>
+        <a href="https://pi.dev" target="_blank" class="text-white hover:underline font-medium">pi.dev &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison Table -->
+  <section id="comparison" class="max-w-5xl mx-auto px-4 sm:px-6 py-16 border-t border-white/[0.06]">
+    <div class="text-center max-w-xl mx-auto mb-10">
+      <h2 class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Comparison</h2>
+      <h3 class="text-2xl font-bold text-white">CLI vs Desktop</h3>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs border-collapse">
+        <thead>
+          <tr class="border-b border-zinc-800 text-zinc-500 uppercase font-mono text-[10px]">
+            <th class="py-2.5 px-3">Capability</th>
+            <th class="py-2.5 px-3">Pi CLI</th>
+            <th class="py-2.5 px-3 text-white font-medium">Pi Desktop</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-800/60 text-zinc-300">
+          <tr>
+            <td class="py-3 px-3 font-medium text-white">Distribution</td>
+            <td class="py-3 px-3 text-zinc-500">Requires global npm runtime</td>
+            <td class="py-3 px-3 text-white font-medium">Portable standalone .exe or npm</td>
+          </tr>
+          <tr>
+            <td class="py-3 px-3 font-medium text-white">Model Selection</td>
+            <td class="py-3 px-3 text-zinc-500">Command line flags</td>
+            <td class="py-3 px-3 text-white font-medium">Searchable provider-filtered selector</td>
+          </tr>
+          <tr>
+            <td class="py-3 px-3 font-medium text-white">Session History</td>
+            <td class="py-3 px-3 text-zinc-500">Manual jsonl files</td>
+            <td class="py-3 px-3 text-white font-medium">Instant session resumption with preview</td>
+          </tr>
+          <tr>
+            <td class="py-3 px-3 font-medium text-white">Code Copying</td>
+            <td class="py-3 px-3 text-zinc-500">Manual terminal selection</td>
+            <td class="py-3 px-3 text-white font-medium">One-click syntax-highlighted block copy</td>
+          </tr>
+          <tr>
+            <td class="py-3 px-3 font-medium text-white">Process Recovery</td>
+            <td class="py-3 px-3 text-zinc-500">Manual process restart</td>
+            <td class="py-3 px-3 text-white font-medium">Auto-healing background supervisor</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Download Section -->
+  <section id="download" class="max-w-5xl mx-auto px-4 sm:px-6 py-20 border-t border-white/[0.06]">
+    <div class="text-center max-w-xl mx-auto mb-12">
+      <h2 class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Get Started</h2>
+      <h3 class="text-2xl sm:text-3xl font-bold text-white">Download Pi Desktop</h3>
+      <p class="text-xs text-zinc-400 mt-2">Zero-install portable binary for Windows or build from source.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      
+      <!-- Portable Binary Card -->
+      <div class="panel p-6 rounded-xl flex flex-col justify-between space-y-5">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">WINDOWS</span>
+            <span id="card-version" class="text-xs font-mono text-zinc-500">v1.0.6</span>
+          </div>
+
+          <h4 class="text-lg font-bold text-white">Portable Executable</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Self-contained binary. Download and run directly. No administrative rights or installation needed.
+          </p>
+
+          <div class="space-y-1.5 py-1 text-xs text-zinc-400 font-mono text-[11px]">
+            <div>&bull; Windows 10 / 11 (x64)</div>
+            <div>&bull; Embedded official branding &amp; icon</div>
+            <div>&bull; Automatic Pi CLI detection</div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-zinc-800/80 space-y-2">
+          <a href="https://github.com/bunnywaffle/pi-desktop/releases/download/v1.0.6/Pi.Desktop-Portable.exe" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold text-xs transition">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 16l4-5h-3V4h-2v7H8l4 5zm9 2H3v2h18v-2z"/></svg>
+            <span>Download Pi Desktop-Portable.exe</span>
+          </a>
+          <div class="text-center">
+            <a href="https://github.com/bunnywaffle/pi-desktop/releases" target="_blank" class="text-[10px] text-zinc-500 hover:text-zinc-300 transition font-mono">
+              View all release tags &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Build from Source Card -->
+      <div class="panel p-6 rounded-xl flex flex-col justify-between space-y-5">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">DEVELOPERS</span>
+            <span class="text-xs font-mono text-zinc-500">Node &bull; Electron</span>
+          </div>
+
+          <h4 class="text-lg font-bold text-white">Build from Source</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Clone and run locally on Windows, macOS, or Linux.
+          </p>
+
+          <div class="rounded-lg bg-zinc-950 border border-zinc-800 p-3 space-y-1.5 font-mono text-[11px] text-zinc-300">
+            <div class="text-zinc-600 text-[10px]"># Clone &amp; setup</div>
+            <div>git clone https://github.com/bunnywaffle/pi-desktop.git</div>
+            <div>cd pi-desktop &amp;&amp; npm install</div>
+            <div class="text-zinc-600 text-[10px] pt-1"># Run dev mode</div>
+            <div class="text-white font-medium">npm run dev</div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-zinc-800/80">
+          <a href="https://github.com/bunnywaffle/pi-desktop" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg border border-zinc-800 bg-zinc-900 hover:border-zinc-700 text-zinc-200 text-xs font-medium transition">
+            <span>Repository on GitHub</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Minimalist Footer -->
+  <footer class="border-t border-white/[0.06] py-8 text-xs text-zinc-500">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      
+      <div class="flex items-center gap-2.5">
+        <div class="w-5 h-5 rounded bg-zinc-900 border border-zinc-800 p-0.5 flex items-center justify-center">
+          <svg class="w-full h-full" viewBox="0 0 800 800" fill="none">
+            <rect width="800" height="800" rx="120" fill="#09090b"/>
+            <path fill="#fff" fill-rule="evenodd" d="M165.29 165.29 H517.36 V400 H400 V517.36 H282.65 V634.72 H165.29 Z M282.65 282.65 V400 H400 V282.65 Z"/>
+            <path fill="#fff" d="M517.36 400 H634.72 V634.72 H517.36 Z"/>
+          </svg>
+        </div>
+        <span class="text-zinc-400 font-medium">Pi Desktop</span>
+        <span>&bull;</span>
+        <span>MIT License</span>
+      </div>
+
+      <div class="flex items-center gap-5 text-xs">
+        <a href="https://github.com/bunnywaffle/pi-desktop" target="_blank" class="hover:text-zinc-300 transition">GitHub</a>
+        <a href="https://github.com/bunnywaffle/pi-desktop/releases" target="_blank" class="hover:text-zinc-300 transition">Releases</a>
+        <a href="https://pi.dev" target="_blank" class="hover:text-zinc-300 transition">pi.dev</a>
       </div>
 
     </div>
   </footer>
 
   <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-16 opacity-0 transition duration-300 pointer-events-none px-4 py-2.5 rounded-xl bg-obsidian-900 border border-brand/50 text-brand-light font-medium text-xs shadow-2xl flex items-center gap-2">
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-    <span id="toast-text">Copied to clipboard!</span>
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-12 opacity-0 transition duration-200 pointer-events-none px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-white font-medium text-xs shadow-xl">
+    <span id="toast-text">Copied to clipboard</span>
   </div>
 
-  <!-- Interactive JavaScript -->
   <script>
-    // Tab switching for the interactive desktop window
     const tabs = ['chat', 'models', 'sessions', 'packages'];
 
     function switchTab(target) {
@@ -844,18 +696,17 @@
         const btnEl = document.getElementById('tab-btn-' + tab);
         if (tab === target) {
           viewEl.classList.remove('hidden');
-          btnEl.className = 'px-3 py-1 rounded-md bg-obsidian-800 text-white font-medium transition';
+          btnEl.className = 'px-2.5 py-0.5 rounded bg-zinc-800 text-white font-medium transition';
         } else {
           viewEl.classList.add('hidden');
-          btnEl.className = 'px-3 py-1 rounded-md hover:bg-obsidian-800/60 text-obsidian-400 hover:text-white font-medium transition';
+          btnEl.className = 'px-2.5 py-0.5 rounded text-zinc-400 hover:text-white transition';
         }
       });
     }
 
-    // Copy to clipboard helper
     function copyToClipboard(text, btn) {
       navigator.clipboard.writeText(text).then(() => {
-        showToast('Copied to clipboard!');
+        showToast('Copied to clipboard');
       }).catch(err => {
         showToast('Failed to copy');
       });
@@ -865,20 +716,19 @@
       const toast = document.getElementById('toast');
       const toastText = document.getElementById('toast-text');
       toastText.innerText = msg;
-      toast.classList.remove('translate-y-16', 'opacity-0');
+      toast.classList.remove('translate-y-12', 'opacity-0');
       setTimeout(() => {
-        toast.classList.add('translate-y-16', 'opacity-0');
-      }, 2500);
+        toast.classList.add('translate-y-12', 'opacity-0');
+      }, 2000);
     }
 
-    // Dynamic GitHub API fetcher
     async function fetchGitHubData() {
       try {
         const repoRes = await fetch('https://api.github.com/repos/bunnywaffle/pi-desktop');
         if (repoRes.ok) {
           const repoData = await repoRes.json();
           if (repoData.stargazers_count !== undefined) {
-            document.getElementById('github-stars').innerText = repoData.stargazers_count + ' &#9733;';
+            document.getElementById('github-stars').innerText = repoData.stargazers_count + ' ★';
           }
         }
 
