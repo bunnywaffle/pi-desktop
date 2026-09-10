@@ -152,7 +152,7 @@ export const PackageManagerView: React.FC<PackageManagerProps> = ({ projectDir, 
       </div>
 
       {/* Tabs & Search */}
-      <div className="px-5 py-3 border-b border-dark-800/80 flex items-center justify-between bg-dark-950/40 text-xs">
+      <div className="px-5 py-3 border-b border-dark-800 flex items-center justify-between bg-dark-950/40 text-xs">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setActiveTab('installed')}
@@ -216,7 +216,7 @@ export const PackageManagerView: React.FC<PackageManagerProps> = ({ projectDir, 
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-dark-800/80 text-xs">
+                    <div className="flex items-center justify-between pt-2 border-t border-dark-800 text-xs">
                       <button
                         onClick={() => handleUpdate(pkg.source)}
                         className="text-dark-400 hover:text-dark-200 flex items-center gap-1 transition"
@@ -359,7 +359,7 @@ export const PackageManagerView: React.FC<PackageManagerProps> = ({ projectDir, 
                         <p className="text-xs text-dark-300 leading-relaxed">{pkg.description}</p>
                       </div>
 
-                      <div className="pt-2.5 border-t border-dark-800/80 flex items-center justify-between text-xs">
+                      <div className="pt-2.5 border-t border-dark-800 flex items-center justify-between text-xs">
                         <span className="text-[11px] text-dark-500 font-mono truncate max-w-[180px]">
                           {pkg.source}
                         </span>

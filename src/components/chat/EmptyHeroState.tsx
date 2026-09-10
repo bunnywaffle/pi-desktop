@@ -12,30 +12,22 @@ export const EmptyHeroState: React.FC<EmptyHeroStateProps> = ({ projectName, onS
     {
       title: 'Explore and understand code',
       prompt: `Inspect the code structure and architecture in ${projectName}.`,
-      icon: Compass,
-      color: 'text-blue-400',
-      bgColor: 'bg-blue-500/10 hover:border-blue-500/40'
+      icon: Compass
     },
     {
       title: 'Build a new feature, app, or tool',
       prompt: `Let's build a new feature for ${projectName}. What should we start with?`,
-      icon: Hammer,
-      color: 'text-purple-400',
-      bgColor: 'bg-purple-500/10 hover:border-purple-500/40'
+      icon: Hammer
     },
     {
       title: 'Review code and suggest changes',
       prompt: `Review recent changes in ${projectName} and check for quality and performance improvements.`,
-      icon: RefreshCw,
-      color: 'text-emerald-400',
-      bgColor: 'bg-emerald-500/10 hover:border-emerald-500/40'
+      icon: RefreshCw
     },
     {
       title: 'Fix issues and failures',
       prompt: `Check for errors, broken tests, or bug fixes in ${projectName}.`,
-      icon: Bug,
-      color: 'text-orange-400',
-      bgColor: 'bg-orange-500/10 hover:border-orange-500/40'
+      icon: Bug
     }
   ];
 
@@ -59,10 +51,10 @@ export const EmptyHeroState: React.FC<EmptyHeroStateProps> = ({ projectName, onS
             <button
               key={idx}
               onClick={() => onSelectAction(card.prompt)}
-              className={`flex flex-col items-start text-left p-4 rounded-xl border border-dark-700/60 bg-dark-900/60 hover:bg-dark-800/80 transition shadow-sm group ${card.bgColor}`}
+              className="flex flex-col items-start text-left p-4 rounded-xl border border-dark-800 bg-dark-900 hover:bg-dark-850 hover:border-dark-700 transition shadow-sm group"
             >
-              <Icon size={18} className={`${card.color} mb-3 group-hover:scale-110 transition-transform`} />
-              <span className="text-xs text-dark-200 font-medium leading-snug">
+              <Icon size={18} className="text-dark-400 group-hover:text-pi-accent mb-3 group-hover:scale-110 transition-all" />
+              <span className="text-xs text-dark-200 group-hover:text-white font-medium leading-snug transition-colors">
                 {card.title}
               </span>
             </button>

@@ -97,7 +97,7 @@ export const ExtensionManagerView: React.FC<ExtensionManagerProps> = ({ projectD
       </div>
 
       {/* Search and stats bar */}
-      <div className="px-5 py-3 border-b border-dark-800/80 bg-dark-950/40 flex items-center justify-between gap-4">
+      <div className="px-5 py-3 border-b border-dark-800 bg-dark-950/40 flex items-center justify-between gap-4">
         <div className="relative flex-1 max-w-md">
           <Search size={14} className="absolute left-3 top-2.5 text-dark-400" />
           <input

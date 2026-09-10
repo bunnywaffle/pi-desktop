@@ -276,17 +276,17 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
     <div className="w-full max-w-3xl mx-auto px-4 pb-4">
       <div
         onClick={() => textareaRef.current?.focus()}
-        className="bg-dark-900 border border-dark-700/80 rounded-2xl shadow-2xl p-2.5 transition-all focus-within:border-dark-600 focus-within:ring-1 focus-within:ring-dark-600/50 cursor-text"
+        className="bg-dark-900 border border-dark-800 rounded-2xl shadow-xl p-2.5 transition-all focus-within:border-dark-700 cursor-text"
       >
         {/* Top dock info pills */}
         <div className="flex items-center gap-2 mb-2 px-1 text-[11px] text-dark-400 font-medium" onClick={(e) => e.stopPropagation()}>
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-dark-800/80 text-dark-300">
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-dark-800 text-dark-300">
             <Folder size={11} className="text-dark-400" />
             <span>{projectName || 'Workspace'}</span>
           </div>
 
           {branch && (
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-dark-800/80 text-dark-300">
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-dark-800 text-dark-300">
               <GitBranch size={11} className="text-dark-400" />
               <span>{branch}</span>
             </div>
@@ -361,7 +361,7 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
                   setShowModelPicker(!showModelPicker);
                   setShowThinkingPicker(false);
                 }}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-dark-800 hover:bg-dark-750 text-dark-200 hover:text-white transition text-[11px] font-medium border border-dark-700/80 shadow-xs"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-dark-800 hover:bg-dark-750 text-dark-200 hover:text-white transition text-[11px] font-medium border border-dark-750 shadow-xs"
                 title="Select model and view provider details"
               >
                 <Sparkles size={12} className="text-pi-accent" />
@@ -443,7 +443,7 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
                               setShowModelPicker(false);
                               setModelSearchQuery('');
                             }}
-                            className={`w-full text-left p-2 rounded-lg border transition flex flex-col gap-0.5 ${isSelected ? 'bg-dark-800 border-pi-accent text-white shadow-xs' : 'bg-dark-950/60 border-dark-800/80 hover:bg-dark-800/80 hover:border-dark-700 text-dark-200'}`}
+                            className={`w-full text-left p-2 rounded-lg border transition flex flex-col gap-0.5 ${isSelected ? 'bg-dark-800 border-pi-accent text-white shadow-xs' : 'bg-dark-950 border-dark-800 hover:bg-dark-800 hover:border-dark-700 text-dark-200'}`}
                           >
                             <div className="flex items-center justify-between gap-2">
                               <span className="font-semibold text-white truncate text-xs">

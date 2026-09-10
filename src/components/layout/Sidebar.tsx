@@ -200,12 +200,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <div className="w-64 bg-dark-950 border-r border-dark-800/80 flex flex-col h-full text-xs text-dark-300">
+    <div className="w-64 bg-dark-950 border-r border-dark-800 flex flex-col h-full text-xs text-dark-300">
       {/* Top New Chat button */}
       <div className="p-3 pb-2">
         <button
           onClick={onNewChat}
-          className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-dark-800/80 hover:bg-dark-800 text-dark-100 font-medium transition border border-dark-700/50 shadow-sm"
+          className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-dark-800 hover:bg-dark-750 text-dark-100 font-medium transition border border-dark-800 shadow-sm"
         >
           <div className="flex items-center gap-2">
             <Plus size={15} className="text-pi-accent" />
@@ -216,7 +216,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Main navigation tabs: ONLY Chat, Skills, Manager, Settings */}
-      <div className="px-2 py-1 space-y-0.5 border-b border-dark-800/60 pb-2">
+      <div className="px-2 py-1 space-y-0.5 border-b border-dark-800 pb-2">
         <button
           onClick={() => onSelectTab('chat')}
           className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-md transition ${currentTab === 'chat' ? 'bg-dark-800 text-white font-medium' : 'hover:bg-dark-900 hover:text-dark-200'}`}
@@ -382,7 +382,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div
           ref={menuRef}
           style={{ top: Math.min(contextMenu.y, window.innerHeight - 200), left: Math.min(contextMenu.x, window.innerWidth - 200) }}
-          className="fixed bg-dark-900 border border-dark-700/90 rounded-lg shadow-2xl py-1 z-50 min-w-[180px] text-xs text-dark-200 animate-in fade-in"
+          className="fixed bg-dark-900 border border-dark-800 rounded-lg shadow-2xl py-1 z-50 min-w-[180px] text-xs text-dark-200 animate-in fade-in"
         >
           {contextMenu.type === 'project' && contextMenu.project && (
             <>

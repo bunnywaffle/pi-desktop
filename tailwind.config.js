@@ -7,6 +7,10 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      borderColor: ({ theme }) => ({
+        ...theme('colors'),
+        DEFAULT: 'var(--color-dark-800, #202024)',
+      }),
       colors: {
         dark: {
           950: 'var(--color-dark-950, #09090b)',

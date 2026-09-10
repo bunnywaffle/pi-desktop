@@ -173,7 +173,7 @@ export const OnlineModelsCatalog: React.FC<OnlineModelsCatalogProps> = ({ onSele
               return (
                 <div
                   key={`${m.provider}-${m.id}`}
-                  className="bg-dark-950/70 border border-dark-800/90 rounded-xl p-3.5 flex flex-col justify-between hover:border-dark-700 transition shadow-sm group"
+                  className="bg-dark-950/70 border border-dark-800 rounded-xl p-3.5 flex flex-col justify-between hover:border-dark-700 transition shadow-sm group"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-1.5">
@@ -201,7 +201,7 @@ export const OnlineModelsCatalog: React.FC<OnlineModelsCatalogProps> = ({ onSele
                     {m.id}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-[10px] text-dark-400 font-mono mt-2 mb-3 bg-dark-900/50 p-2 rounded border border-dark-800/60">
+                  <div className="grid grid-cols-2 gap-2 text-[10px] text-dark-400 font-mono mt-2 mb-3 bg-dark-900/50 p-2 rounded border border-dark-800">
                     <div>
                       <span className="text-dark-500 block">Context:</span>
                       <span className="text-dark-200">{m.contextWindow || '128K'}</span>
@@ -213,7 +213,7 @@ export const OnlineModelsCatalog: React.FC<OnlineModelsCatalogProps> = ({ onSele
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-dark-800/70 flex items-center justify-between">
+                <div className="pt-2 border-t border-dark-800 flex items-center justify-between">
                   <span className="text-[10px] text-dark-500 font-mono">
                     {m.id.includes(':free') ? (
                       <span className="text-emerald-400 font-semibold">100% Free</span>

@@ -59,7 +59,7 @@ export const ToolCallItem: React.FC<ToolCallItemProps> = ({ toolCall, result, is
   };
 
   return (
-    <div className={`my-2 rounded-lg border text-xs font-mono transition-all overflow-hidden ${isError ? 'border-red-500/40 bg-red-950/20' : 'border-dark-700/60 bg-dark-900/60'}`}>
+    <div className={`my-2 rounded-lg border text-xs font-mono transition-all overflow-hidden ${isError ? 'border-red-900 bg-red-950/20' : 'border-dark-800 bg-dark-900'}`}>
       {/* Compact Header */}
       <div
         onClick={() => setExpanded(!expanded)}
@@ -90,7 +90,7 @@ export const ToolCallItem: React.FC<ToolCallItemProps> = ({ toolCall, result, is
 
       {/* Expanded Output */}
       {expanded && (
-        <div className="border-t border-dark-800/80 bg-dark-950/80 p-3 text-[11px] relative">
+        <div className="border-t border-dark-800 bg-dark-950 p-3 text-[11px] relative">
           <div className="flex justify-between items-center text-dark-500 mb-1 font-sans">
             <span>Execution Output</span>
             <button

@@ -14,7 +14,7 @@ export const WidgetPanel: React.FC<WidgetPanelProps> = ({ placement, widgets }) 
       {entries.map(([key, lines]) => (
         <div
           key={key}
-          className="bg-dark-900/80 border border-dark-750/80 rounded-lg p-2.5 text-xs font-mono text-dark-300 space-y-0.5 shadow-sm"
+          className="bg-dark-900/80 border border-dark-750 rounded-lg p-2.5 text-xs font-mono text-dark-300 space-y-0.5 shadow-sm"
         >
           {lines.map((line, idx) => (
             <div key={idx} className="leading-snug">{line}</div>

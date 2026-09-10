@@ -22,7 +22,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   statusText
 }) => {
   return (
-    <div className="h-6 bg-dark-950 border-t border-dark-800/80 px-3 flex items-center justify-between text-[11px] text-dark-400 select-none">
+    <div className="h-6 bg-dark-950 border-t border-dark-800 px-3 flex items-center justify-between text-[11px] text-dark-400 select-none">
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1.5">
           <span className={`w-2 h-2 rounded-full ${isAlive ? 'bg-emerald-500 animate-pulse' : 'bg-dark-600'}`} />

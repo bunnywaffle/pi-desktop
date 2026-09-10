@@ -97,7 +97,7 @@ export const MessageList: React.FC<MessageListProps> = ({
         <div className="absolute bottom-3 left-0 right-0 flex justify-center pointer-events-none z-20">
           <button
             onClick={() => scrollToBottom('smooth')}
-            className="pointer-events-auto flex items-center gap-1.5 px-3.5 py-1.5 bg-dark-800/95 hover:bg-dark-750 text-dark-200 hover:text-white rounded-full border border-dark-700/90 shadow-2xl transition-all text-xs font-medium backdrop-blur-md animate-in fade-in zoom-in-95 group cursor-pointer"
+            className="pointer-events-auto flex items-center gap-1.5 px-3.5 py-1.5 bg-dark-800 hover:bg-dark-750 text-dark-200 hover:text-white rounded-full border border-dark-700 shadow-2xl transition-all text-xs font-medium backdrop-blur-md animate-in fade-in zoom-in-95 group cursor-pointer"
             title="Scroll down to latest message"
           >
             <ArrowDown size={13} className="text-pi-accent group-hover:translate-y-0.5 transition-transform" />
@@ -162,7 +162,7 @@ const MessageItem: React.FC<{
   if (isUser) {
     return (
       <div className="flex flex-col items-end group/usermsg">
-        <div className="max-w-2xl bg-dark-800 border border-dark-750/80 text-dark-100 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm shadow-sm select-text">
+        <div className="max-w-2xl bg-dark-800 border border-dark-750 text-dark-100 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm shadow-sm select-text">
           <p className="whitespace-pre-wrap leading-relaxed">{text}</p>
         </div>
 
@@ -261,7 +261,7 @@ const ThinkingBlock: React.FC<{ thinking: string; isStreaming?: boolean }> = ({ 
       </button>
 
       {open && (
-        <div className="px-3 py-2 border-t border-dark-800/80 bg-dark-950/60 text-dark-300 italic text-[11px] leading-relaxed whitespace-pre-wrap select-text">
+        <div className="px-3 py-2 border-t border-dark-800 bg-dark-950 text-dark-300 italic text-[11px] leading-relaxed whitespace-pre-wrap select-text">
           {thinking}
         </div>
       )}

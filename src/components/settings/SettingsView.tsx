@@ -190,7 +190,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ projectDir, onRefres
       </div>
 
       {/* Tabs */}
-      <div className="px-5 py-2.5 border-b border-dark-800/80 flex items-center justify-between bg-dark-950/40 text-xs">
+      <div className="px-5 py-2.5 border-b border-dark-800 flex items-center justify-between bg-dark-950/40 text-xs">
         <div className="flex items-center gap-4">
           <button
             onClick={() => setActiveTab('general')}

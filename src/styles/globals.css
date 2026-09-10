@@ -23,6 +23,7 @@
 @layer base {
   *, *::before, *::after {
     outline: none !important;
+    border-color: var(--color-dark-800);
   }
   *:focus, *:focus-visible {
     outline: none !important;

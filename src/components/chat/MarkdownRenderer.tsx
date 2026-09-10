@@ -143,7 +143,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, isS
           },
           h2({ children, ...props }: any) {
             return (
-              <h2 className="text-base font-semibold text-dark-100 mt-3.5 mb-1.5 pb-0.5 border-b border-dark-800/60" {...props}>
+              <h2 className="text-base font-semibold text-dark-100 mt-3.5 mb-1.5 pb-0.5 border-b border-dark-800" {...props}>
                 {children}
               </h2>
             );
