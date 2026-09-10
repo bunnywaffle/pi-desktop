@@ -64,12 +64,12 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, isS
               const codeString = String(rawCode || '').replace(/\n$/, '');
               return <CodeBlock language={lang} code={codeString} />;
             }
-            return <pre {...props}>{children}</pre>;
+            return <pre className="!border-none !outline-none" {...props}>{children}</pre>;
           },
           code({ children, className, ...props }: any) {
             return (
               <code
-                className="px-1.5 py-0.5 rounded bg-dark-800 border border-dark-700/70 font-mono text-[13px] text-sky-400 select-text"
+                className="px-1.5 py-0.5 rounded bg-dark-800/80 border border-dark-800 font-mono text-[13px] text-sky-400 select-text"
                 {...props}
               >
                 {children}
@@ -232,7 +232,7 @@ const CodeBlock: React.FC<{ language: string; code: string }> = ({ language, cod
   const displayLanguage = (normalizedLang || 'text').toUpperCase();
 
   return (
-    <div className="my-3 rounded-xl border border-dark-750 bg-[#0d0e11] overflow-hidden shadow-lg group/code">
+    <div className="my-3 rounded-xl border border-dark-800 bg-[#0d0e11] overflow-hidden shadow-sm group/code">
       {/* Code Header Bar */}
       <div className="flex items-center justify-between px-3.5 py-1.5 bg-dark-900/90 border-b border-dark-800 text-[11px] select-none">
         <span className="font-mono font-medium text-dark-400 tracking-wider text-[10px]">
@@ -261,11 +261,11 @@ const CodeBlock: React.FC<{ language: string; code: string }> = ({ language, cod
       <div className="p-3.5 overflow-x-auto font-mono text-xs leading-relaxed select-text">
         {highlightedHtml ? (
           <pre
-            className="!bg-transparent !p-0 !m-0 overflow-visible font-mono"
+            className="!bg-transparent !p-0 !m-0 !border-none !outline-none overflow-visible font-mono"
             dangerouslySetInnerHTML={{ __html: highlightedHtml }}
           />
         ) : (
-          <pre className="!bg-transparent !p-0 !m-0 overflow-visible text-dark-200 font-mono">
+          <pre className="!bg-transparent !p-0 !m-0 !border-none !outline-none overflow-visible text-dark-200 font-mono">
             {code}
           </pre>
         )}

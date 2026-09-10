@@ -58,6 +58,15 @@
       font-family: 'Inter', sans-serif;
       -webkit-font-smoothing: antialiased;
     }
+    *, *::before, *::after {
+      outline: none !important;
+    }
+    *:focus, *:focus-visible {
+      outline: none !important;
+    }
+    button:focus, button:focus-visible, a:focus, a:focus-visible {
+      outline: none !important;
+    }
     .grid-subtle {
       background-size: 32px 32px;
       background-image: 
@@ -66,10 +75,10 @@
     }
     .panel {
       background-color: #111113;
-      border: 1px solid rgba(255, 255, 255, 0.07);
+      border: 1px solid #1f1f23;
     }
     .panel:hover {
-      border-color: rgba(255, 255, 255, 0.15);
+      border-color: #27272a;
     }
     ::-webkit-scrollbar {
       width: 5px;
@@ -93,11 +102,11 @@
   <div class="pointer-events-none fixed inset-0 -z-10 grid-subtle"></div>
 
   <!-- Minimalist Navigation Bar -->
-  <header class="sticky top-0 z-50 border-b border-white/[0.06] bg-[#09090b]/90 backdrop-blur-md">
+  <header class="sticky top-0 z-50 border-b border-zinc-800/60 bg-[#09090b]/90 backdrop-blur-md">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
       <!-- Brand -->
       <a href="#" class="flex items-center gap-2.5 group">
-        <div class="w-7 h-7 rounded-lg bg-zinc-900 border border-white/10 p-1 flex items-center justify-center transition group-hover:border-white/30">
+        <div class="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-800 p-1 flex items-center justify-center transition group-hover:border-zinc-700">
           <svg class="w-full h-full" viewBox="0 0 800 800" fill="none">
             <rect width="800" height="800" rx="120" fill="#09090b"/>
             <path fill="#fff" fill-rule="evenodd" d="M165.29 165.29 H517.36 V400 H400 V517.36 H282.65 V634.72 H165.29 Z M282.65 282.65 V400 H400 V282.65 Z"/>
@@ -106,7 +115,7 @@
         </div>
         <div class="flex items-center gap-2">
           <span class="font-semibold text-white tracking-tight text-sm">Pi Desktop</span>
-          <span id="nav-version" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">v1.0.6</span>
+          <span id="nav-version" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">v1.0.8</span>
         </div>
       </a>
 
@@ -128,7 +137,7 @@
           <span class="font-mono text-[11px]" id="github-stars">GitHub</span>
         </a>
 
-        <a href="#download" class="px-3 py-1 rounded-md bg-white text-black font-semibold text-xs hover:bg-zinc-200 transition">
+        <a href="#download" class="px-3 py-1 rounded-md bg-zinc-200 text-zinc-950 font-semibold text-xs hover:bg-white transition">
           Download
         </a>
       </div>
@@ -141,9 +150,9 @@
     <!-- Understated Pill -->
     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-800 bg-zinc-900/80 text-xs text-zinc-300 mb-8">
       <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
-      <span class="font-mono text-[11px]">v1.0.6 Release</span>
+      <span class="font-mono text-[11px]">v1.0.8 Release</span>
       <span class="text-zinc-600">&bull;</span>
-      <span class="text-zinc-400">Official Brand Mark &amp; Persistent Sessions</span>
+      <span class="text-zinc-400">Official Brand Mark &amp; Dynamic Theme Engine</span>
     </div>
 
     <!-- Stark Crisp Typography -->
@@ -158,7 +167,7 @@
 
     <!-- Clean Monochrome Actions -->
     <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
-      <a id="hero-download-btn" href="https://github.com/bunnywaffle/pi-desktop/releases/download/v1.0.6/Pi.Desktop-Portable.exe" class="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold text-xs transition">
+      <a id="hero-download-btn" href="https://github.com/bunnywaffle/pi-desktop/releases/download/v1.0.8/Pi.Desktop-Portable.exe" class="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-zinc-200 hover:bg-white text-zinc-950 font-semibold text-xs transition">
         <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
           <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
         </svg>
@@ -183,10 +192,10 @@
 
   <!-- Interactive Desktop Window Showcase -->
   <section id="preview" class="max-w-5xl mx-auto px-4 sm:px-6 pb-20">
-    <div class="rounded-xl border border-white/10 bg-[#0f0f11] shadow-2xl overflow-hidden">
+    <div class="rounded-xl border border-zinc-800/80 bg-[#0f0f11] shadow-2xl overflow-hidden">
       
       <!-- Window Titlebar -->
-      <div class="h-10 bg-[#0a0a0c] border-b border-white/[0.06] flex items-center justify-between px-3.5 text-xs select-none">
+      <div class="h-10 bg-[#0a0a0c] border-b border-zinc-800/60 flex items-center justify-between px-3.5 text-xs select-none">
         <div class="flex items-center gap-3">
           <!-- Window Controls -->
           <div class="flex items-center gap-1.5">
@@ -223,7 +232,7 @@
       <!-- Tab 1: Chat View -->
       <div id="view-chat" class="flex flex-col md:flex-row h-[460px]">
         <!-- Sidebar -->
-        <div class="w-full md:w-56 border-b md:border-b-0 md:border-r border-white/[0.06] bg-[#0c0c0e] p-3 flex flex-col justify-between text-xs">
+        <div class="w-full md:w-56 border-b md:border-b-0 md:border-r border-zinc-800/60 bg-[#0c0c0e] p-3 flex flex-col justify-between text-xs">
           <div class="space-y-3.5">
             <div>
               <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block mb-1">Project</span>
@@ -250,7 +259,7 @@
             </div>
           </div>
 
-          <div class="pt-2.5 border-t border-white/[0.06] text-[10px] text-zinc-500 font-mono flex items-center justify-between">
+          <div class="pt-2.5 border-t border-zinc-800/60 text-[10px] text-zinc-500 font-mono flex items-center justify-between">
             <span>Global Pi</span>
             <span class="text-zinc-300">Connected</span>
           </div>
@@ -300,14 +309,14 @@
           </div>
 
           <!-- Bottom Prompt Dock -->
-          <div class="mt-4 pt-2.5 border-t border-white/[0.06]">
+          <div class="mt-4 pt-2.5 border-t border-zinc-800/60">
             <div class="flex items-center justify-between text-[10px] font-mono text-zinc-500 mb-1 px-1">
               <span>Model: claude-3-5-sonnet-20241022</span>
               <span>Ctrl+Enter to send</span>
             </div>
             <div class="relative flex items-center">
               <input type="text" readonly value="Inspect recent changes and verify test suite..." class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:outline-none">
-              <button class="absolute right-1.5 px-2.5 py-1 rounded bg-white text-black font-semibold text-[11px]">Send</button>
+              <button class="absolute right-1.5 px-2.5 py-1 rounded bg-zinc-200 hover:bg-white text-zinc-950 font-semibold text-[11px] transition">Send</button>
             </div>
           </div>
         </div>
@@ -375,7 +384,7 @@
                 <div class="font-medium text-white text-xs">Refactor RPC &amp; IPC event forwarding</div>
                 <div class="text-[10px] text-zinc-500 font-mono mt-0.5">24 turns &bull; claude-3-5-sonnet &bull; 5m ago</div>
               </div>
-              <button class="px-2.5 py-1 rounded bg-white text-black font-semibold text-[10px]">Resume</button>
+              <button class="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-white font-medium text-[10px] transition">Resume</button>
             </div>
             <div class="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/80 flex items-center justify-between">
               <div>
@@ -419,7 +428,7 @@
   </section>
 
   <!-- Core Features Grid -->
-  <section id="features" class="max-w-5xl mx-auto px-4 sm:px-6 py-16 border-t border-white/[0.06]">
+  <section id="features" class="max-w-5xl mx-auto px-4 sm:px-6 py-16 border-t border-zinc-800/60">
     <div class="text-center max-w-xl mx-auto mb-12">
       <h2 class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Capabilities</h2>
       <h3 class="text-2xl sm:text-3xl font-bold text-white">Engineered For Focus and Stability</h3>
@@ -497,7 +506,7 @@
   </section>
 
   <!-- Clean Architecture Diagram -->
-  <section id="architecture" class="max-w-5xl mx-auto px-4 sm:px-6 py-16 border-t border-white/[0.06]">
+  <section id="architecture" class="max-w-5xl mx-auto px-4 sm:px-6 py-16 border-t border-zinc-800/60">
     <div class="text-center max-w-xl mx-auto mb-10">
       <h2 class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Architecture</h2>
       <h3 class="text-2xl font-bold text-white">Unmodified Upstream Engine</h3>
@@ -535,7 +544,7 @@
   </section>
 
   <!-- Comparison Table -->
-  <section id="comparison" class="max-w-5xl mx-auto px-4 sm:px-6 py-16 border-t border-white/[0.06]">
+  <section id="comparison" class="max-w-5xl mx-auto px-4 sm:px-6 py-16 border-t border-zinc-800/60">
     <div class="text-center max-w-xl mx-auto mb-10">
       <h2 class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Comparison</h2>
       <h3 class="text-2xl font-bold text-white">CLI vs Desktop</h3>
@@ -582,7 +591,7 @@
   </section>
 
   <!-- Download Section -->
-  <section id="download" class="max-w-5xl mx-auto px-4 sm:px-6 py-20 border-t border-white/[0.06]">
+  <section id="download" class="max-w-5xl mx-auto px-4 sm:px-6 py-20 border-t border-zinc-800/60">
     <div class="text-center max-w-xl mx-auto mb-12">
       <h2 class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Get Started</h2>
       <h3 class="text-2xl sm:text-3xl font-bold text-white">Download Pi Desktop</h3>
@@ -596,7 +605,7 @@
         <div class="space-y-3">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">WINDOWS</span>
-            <span id="card-version" class="text-xs font-mono text-zinc-500">v1.0.6</span>
+            <span id="card-version" class="text-xs font-mono text-zinc-500">v1.0.8</span>
           </div>
 
           <h4 class="text-lg font-bold text-white">Portable Executable</h4>
@@ -612,7 +621,7 @@
         </div>
 
         <div class="pt-3 border-t border-zinc-800/80 space-y-2">
-          <a href="https://github.com/bunnywaffle/pi-desktop/releases/download/v1.0.6/Pi.Desktop-Portable.exe" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold text-xs transition">
+          <a href="https://github.com/bunnywaffle/pi-desktop/releases/download/v1.0.8/Pi.Desktop-Portable.exe" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-zinc-200 hover:bg-white text-zinc-950 font-semibold text-xs transition">
             <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 16l4-5h-3V4h-2v7H8l4 5zm9 2H3v2h18v-2z"/></svg>
             <span>Download Pi Desktop-Portable.exe</span>
           </a>
@@ -657,7 +666,7 @@
   </section>
 
   <!-- Minimalist Footer -->
-  <footer class="border-t border-white/[0.06] py-8 text-xs text-zinc-500">
+  <footer class="border-t border-zinc-800/60 py-8 text-xs text-zinc-500">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
       
       <div class="flex items-center gap-2.5">
@@ -735,7 +744,7 @@
         const releaseRes = await fetch('https://api.github.com/repos/bunnywaffle/pi-desktop/releases/latest');
         if (releaseRes.ok) {
           const releaseData = await releaseRes.json();
-          const tagName = releaseData.tag_name || 'v1.0.6';
+          const tagName = releaseData.tag_name || 'v1.0.8';
           document.getElementById('nav-version').innerText = tagName;
           document.getElementById('card-version').innerText = tagName;
           

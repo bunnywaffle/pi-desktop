@@ -39,7 +39,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
       {/* Left controls */}
       <div className="flex items-center gap-3" style={{ WebkitAppRegion: 'no-drag' } as any}>
         {/* App brand badge */}
-        <div className="flex items-center gap-2 px-2 py-1 rounded bg-dark-800/90 border border-dark-750 text-white font-semibold shadow-xs">
+        <div className="flex items-center gap-2 px-2 py-1 rounded bg-dark-800/60 border border-dark-800 text-dark-100 font-medium shadow-xs">
           <PiLogo size={16} withBackground />
           <span>{appName}</span>
           <span className="text-[10px] text-dark-400 font-mono font-normal">v{version}</span>

@@ -21,6 +21,15 @@
 }
 
 @layer base {
+  *, *::before, *::after {
+    outline: none !important;
+  }
+  *:focus, *:focus-visible {
+    outline: none !important;
+  }
+  button:focus, button:focus-visible {
+    outline: none !important;
+  }
   * {
     box-sizing: border-box;
   }
@@ -62,7 +71,7 @@
 /* Code block highlight */
 pre {
   background-color: var(--color-dark-950);
-  border: 1px solid var(--color-dark-800);
+  border: none;
   border-radius: 0.5rem;
   padding: 0.75rem 1rem;
   overflow-x: auto;

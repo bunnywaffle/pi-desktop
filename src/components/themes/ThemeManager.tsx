@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Palette, Check, FolderOpen, RefreshCw, Sparkles, Sun, Moon, Info } from 'lucide-react';
 import { BUILTIN_THEMES, ThemeDefinition, ThemeService } from '../../services/themeService';
 import { PiTheme } from '../../types/pi';
@@ -131,7 +131,7 @@ export const ThemeManagerView: React.FC = () => {
                   onClick={() => handleSelectTheme(th)}
                   className={`p-4 rounded-xl border cursor-pointer transition flex flex-col justify-between group shadow-sm ${
                     isSelected
-                      ? 'border-pi-accent bg-dark-800/90 shadow-md ring-1 ring-pi-accent/40'
+                      ? 'border-pi-accent/70 bg-dark-800/80 shadow-md'
                       : 'border-dark-800 bg-dark-950/70 hover:border-dark-700 hover:bg-dark-900'
                   }`}
                 >
@@ -211,7 +211,7 @@ export const ThemeManagerView: React.FC = () => {
                     onClick={() => handleSelectTheme(th)}
                     className={`p-4 rounded-xl border cursor-pointer transition flex flex-col justify-between group shadow-sm ${
                       isSelected
-                        ? 'border-pi-accent bg-dark-800/90 shadow-md ring-1 ring-pi-accent/40'
+                        ? 'border-pi-accent/70 bg-dark-800/80 shadow-md'
                         : 'border-dark-800 bg-dark-950/70 hover:border-dark-700 hover:bg-dark-900'
                     }`}
                   >
@@ -271,7 +271,7 @@ export const ThemeManagerView: React.FC = () => {
 
       {/* Floating Toast Feedback */}
       {toastMessage && (
-        <div className="absolute bottom-5 right-5 px-3.5 py-2 rounded-lg bg-dark-800 border border-pi-accent/50 text-white font-medium text-xs shadow-xl flex items-center gap-2 animate-fade-in">
+        <div className="absolute bottom-5 right-5 px-3.5 py-2 rounded-lg bg-dark-800 border border-dark-700 text-white font-medium text-xs shadow-xl flex items-center gap-2 animate-fade-in">
           <Check size={14} className="text-pi-accent" />
           <span>{toastMessage}</span>
         </div>
