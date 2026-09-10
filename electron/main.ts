@@ -222,6 +222,7 @@ function setupIpc() {
 
   // Themes
   ipcMain.handle('themes:list', async (_, current) => ThemeManager.discoverThemes(current));
+  ipcMain.handle('themes:open-folder', async () => ThemeManager.openThemesFolder());
 
   // Settings
   ipcMain.handle('settings:read', async (_, { scope, projectDir }) => SettingsManager.readSettings(scope, projectDir));

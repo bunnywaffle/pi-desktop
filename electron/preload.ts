@@ -93,6 +93,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Themes
   listThemes: (currentTheme?: string) => ipcRenderer.invoke('themes:list', currentTheme),
+  openThemesFolder: () => ipcRenderer.invoke('themes:open-folder'),
 
   // Settings & Providers
   readSettings: (scope: 'global' | 'project', projectDir?: string) =>
