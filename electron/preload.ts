@@ -138,6 +138,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Sessions
   listSessionsForProject: (path: string) => ipcRenderer.invoke('sessions:project', path),
   listAllRecentSessions: () => ipcRenderer.invoke('sessions:recent'),
+  listStandaloneSessions: (projectPaths?: string[]) => ipcRenderer.invoke('sessions:standalone', projectPaths),
   deleteSession: (path: string) => ipcRenderer.invoke('sessions:delete', path),
   renameSession: (path: string, newName: string) => ipcRenderer.invoke('sessions:rename', { path, newName }),
   forkSession: (path: string) => ipcRenderer.invoke('sessions:fork', path),

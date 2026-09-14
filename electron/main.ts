@@ -277,6 +277,7 @@ function setupIpc() {
   // Sessions
   ipcMain.handle('sessions:project', async (_, path) => SessionManager.getSessionsForProject(path));
   ipcMain.handle('sessions:recent', async () => SessionManager.getAllRecentSessions());
+  ipcMain.handle('sessions:standalone', async (_, projectPaths) => SessionManager.getStandaloneSessions(projectPaths));
   ipcMain.handle('sessions:delete', async (_, path) => SessionManager.deleteSession(path));
   ipcMain.handle('sessions:rename', async (_, { path, newName }) => SessionManager.renameSession(path, newName));
   ipcMain.handle('sessions:fork', async (_, path) => SessionManager.forkSession(path));

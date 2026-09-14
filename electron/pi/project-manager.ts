@@ -17,7 +17,7 @@ export class ProjectManager {
     const isWin = os.platform() === 'win32';
 
     if (isWin) {
-      const match = trimmed.match(/^([a-zA-Z])-(.*)$/);
+      const match = trimmed.match(/^([a-zA-Z])-+(.*)$/);
       if (match) {
         const drive = match[1].toUpperCase() + ':';
         const rest = match[2].replace(/-/g, path.sep);

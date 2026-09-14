@@ -171,7 +171,7 @@ export interface PiSessionSummary {
   lastMessage?: string;
   model?: string;
   thinkingLevel?: string;
-  messageCount: number;
+  messageCount?: number;
   cwd?: string;
 }
 

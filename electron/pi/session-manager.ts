@@ -13,23 +13,54 @@ export class SessionManager {
   }
 
   public static encodeProjectPath(projectPath: string): string {
-    // Replaces / and \ and : with -
-    const normalized = projectPath.replace(/^[a-zA-Z]:/, (match) => match[0].toUpperCase());
-    const sanitized = normalized.replace(/[/\\:]+/g, '-').replace(/^-+|-+$/g, '');
-    return `--${sanitized}--`;
+    const resolved = path.resolve(projectPath).replace(/^[a-zA-Z]:/, (match) => match.toUpperCase());
+    const safePath = `--${resolved.replace(/^[/\\]/, '').replace(/[/\\:]/g, '-')}--`;
+    return safePath;
   }
 
   public static async getSessionsForProject(projectPath: string): Promise<PiSessionSummary[]> {
     const baseDir = this.getSessionStorageDir();
+    if (!fs.existsSync(baseDir)) return [];
+
     const encoded = this.encodeProjectPath(projectPath);
     const targetDir = path.join(baseDir, encoded);
 
-    if (!fs.existsSync(targetDir)) {
-      // Also check fuzzy match in baseDir
-      return this.fuzzyFindProjectSessions(baseDir, projectPath);
+    if (fs.existsSync(targetDir)) {
+      const sessions = this.readSessionsInDirectory(targetDir);
+      if (sessions.length > 0) return sessions;
     }
 
-    return this.readSessionsInDirectory(targetDir);
+    // Try case-insensitive matching or normalized cwd matching
+    const normalizedTarget = path.resolve(projectPath).toLowerCase();
+    try {
+      const entries = fs.readdirSync(baseDir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (!entry.isDirectory()) continue;
+        const dirPath = path.join(baseDir, entry.name);
+        if (entry.name.toLowerCase() === encoded.toLowerCase()) {
+          const sessions = this.readSessionsInDirectory(dirPath);
+          if (sessions.length > 0) return sessions;
+        }
+      }
+
+      // Deep match: check cwd inside session files
+      for (const entry of entries) {
+        if (!entry.isDirectory()) continue;
+        const dirPath = path.join(baseDir, entry.name);
+        const files = fs.readdirSync(dirPath).filter(f => f.endsWith('.jsonl'));
+        if (files.length === 0) continue;
+
+        const samplePath = path.join(dirPath, files[0]);
+        const summary = this.parseSessionFile(samplePath);
+        if (summary?.cwd && path.resolve(summary.cwd).toLowerCase() === normalizedTarget) {
+          return this.readSessionsInDirectory(dirPath);
+        }
+      }
+    } catch {
+      // Ignore
+    }
+
+    return this.fuzzyFindProjectSessions(baseDir, projectPath);
   }
 
   private static fuzzyFindProjectSessions(baseDir: string, projectPath: string): PiSessionSummary[] {
@@ -47,6 +78,19 @@ export class SessionManager {
       // Ignore
     }
     return [];
+  }
+
+  public static async getStandaloneSessions(knownProjectPaths: string[] = []): Promise<PiSessionSummary[]> {
+    const all = await this.getAllRecentSessions();
+    const normalizedKnown = knownProjectPaths.map(p => path.resolve(p).toLowerCase());
+    const homeDir = path.resolve(os.homedir()).toLowerCase();
+
+    return all.filter(s => {
+      if (!s.cwd) return true;
+      const resolvedCwd = path.resolve(s.cwd).toLowerCase();
+      if (resolvedCwd === homeDir) return true;
+      return !normalizedKnown.includes(resolvedCwd);
+    });
   }
 
   public static async getAllRecentSessions(): Promise<Array<PiSessionSummary & { projectDir: string }>> {

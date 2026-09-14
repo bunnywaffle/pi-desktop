@@ -135,7 +135,7 @@ export const LoadExistingSessionModal: React.FC<LoadExistingSessionModalProps> =
                     <span className="font-semibold text-white text-xs truncate group-hover:text-purple-300 transition">
                       {sess.name || sess.id}
                     </span>
-                    {sess.messageCount > 0 && (
+                    {(sess.messageCount || 0) > 0 && (
                       <span className="px-1.5 py-0.2 rounded-full bg-dark-800 border border-dark-700 text-[10px] text-dark-300 font-mono">
                         {sess.messageCount} msgs
                       </span>

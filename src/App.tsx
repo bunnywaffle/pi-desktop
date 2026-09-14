@@ -70,6 +70,7 @@ export const App: React.FC = () => {
   const [projects, setProjects] = useState<PiProject[]>([]);
   const [currentProject, setCurrentProject] = useState<PiProject | null>(null);
   const [activeSession, setActiveSession] = useState<PiSessionSummary | null>(null);
+  const [standaloneSessions, setStandaloneSessions] = useState<PiSessionSummary[]>([]);
 
   // Chat & Streaming State
   const [messages, setMessages] = useState<PiMessage[]>([]);
@@ -116,6 +117,29 @@ export const App: React.FC = () => {
     }
   };
 
+  const refreshSessions = async () => {
+    try {
+      const projList: PiProject[] = await (window as any).electronAPI?.listProjects?.();
+      if (projList) {
+        setProjects(projList);
+        if (currentProject) {
+          const updated = projList.find(p => p.path.toLowerCase() === currentProject.path.toLowerCase());
+          if (updated) {
+            setCurrentProject(prev => prev ? { ...prev, sessions: updated.sessions } : updated);
+          }
+        }
+      }
+
+      if ((window as any).electronAPI?.listStandaloneSessions) {
+        const knownPaths = (projList || []).map(p => p.path);
+        const standalone = await (window as any).electronAPI.listStandaloneSessions(knownPaths);
+        setStandaloneSessions(standalone || []);
+      }
+    } catch (err) {
+      console.warn('Failed to refresh sessions:', err);
+    }
+  };
+
   const loadProjectsAndStart = async () => {
     try {
       const saved = getSavedAppState();
@@ -126,6 +150,12 @@ export const App: React.FC = () => {
 
       const projList: PiProject[] = await (window as any).electronAPI.listProjects();
       setProjects(projList || []);
+
+      if ((window as any).electronAPI?.listStandaloneSessions) {
+        const knownPaths = (projList || []).map(p => p.path);
+        const standalone = await (window as any).electronAPI.listStandaloneSessions(knownPaths);
+        setStandaloneSessions(standalone || []);
+      }
 
       // Priority 1: Restore project the user was previously working in
       let activeProj: PiProject | null = null;
@@ -381,20 +411,22 @@ export const App: React.FC = () => {
         setStreamingText('');
         setStreamingThinking('');
         setStreamingToolCalls([]);
-        (window as any).electronAPI?.getState?.().then((state: any) => {
+        (window as any).electronAPI?.getState?.().then(async (state: any) => {
           if (state?.sessionFile) {
             saveAppState({
               sessionPath: state.sessionFile,
               sessionId: state.sessionId,
               modelId: state.model?.id || selectedModel
             });
-            setActiveSession(prev => prev || {
-              id: state.sessionId || 'active-session',
+            setActiveSession(prev => ({
+              id: state.sessionId || prev?.id || 'active-session',
               path: state.sessionFile,
+              name: (prev?.name && prev.name !== 'New session') ? prev.name : (messages[0]?.content as string)?.slice(0, 40) || 'Active Session',
               messageCount: messages.length + 1,
               timestamp: Date.now(),
               cwd: currentProject?.path
-            });
+            }));
+            await refreshSessions();
           }
         }).catch(() => {});
         break;
@@ -408,20 +440,22 @@ export const App: React.FC = () => {
         (window as any).electronAPI?.getSessionStats?.().then((s: any) => {
           if (s) setSessionStats(s);
         }).catch(() => {});
-        (window as any).electronAPI?.getState?.().then((state: any) => {
+        (window as any).electronAPI?.getState?.().then(async (state: any) => {
           if (state?.sessionFile) {
             saveAppState({
               sessionPath: state.sessionFile,
               sessionId: state.sessionId,
               modelId: state.model?.id || selectedModel
             });
-            setActiveSession(prev => prev || {
-              id: state.sessionId || 'active-session',
+            setActiveSession(prev => ({
+              id: state.sessionId || prev?.id || 'active-session',
               path: state.sessionFile,
+              name: (prev?.name && prev.name !== 'New session') ? prev.name : (messages[0]?.content as string)?.slice(0, 40) || 'Active Session',
               messageCount: messages.length + 1,
               timestamp: Date.now(),
               cwd: currentProject?.path
-            });
+            }));
+            await refreshSessions();
           }
         }).catch(() => {});
         break;
@@ -453,13 +487,22 @@ export const App: React.FC = () => {
       await (window as any).electronAPI.prompt(text);
 
       // Record active session information
-      (window as any).electronAPI?.getState?.().then((state: any) => {
+      (window as any).electronAPI?.getState?.().then(async (state: any) => {
         if (state?.sessionFile) {
           saveAppState({
             sessionPath: state.sessionFile,
             sessionId: state.sessionId,
             modelId: state.model?.id || selectedModel
           });
+          setActiveSession(prev => ({
+            id: state.sessionId || prev?.id || 'active-session',
+            path: state.sessionFile,
+            name: (prev?.name && prev.name !== 'New session') ? prev.name : text.slice(0, 40),
+            messageCount: (prev?.messageCount || 0) + 1,
+            timestamp: Date.now(),
+            cwd: currentProject?.path
+          }));
+          await refreshSessions();
         }
       }).catch(() => {});
     } catch (err: any) {
@@ -489,9 +532,19 @@ export const App: React.FC = () => {
     try {
       await (window as any).electronAPI.newSession();
       setMessages([]);
-      setActiveSession(null);
+      const newSessId = 'sess_' + Date.now();
+      const optimistic: PiSessionSummary = {
+        id: newSessId,
+        path: '',
+        name: 'New session',
+        messageCount: 0,
+        timestamp: Date.now(),
+        cwd: currentProject?.path
+      };
+      setActiveSession(optimistic);
       saveAppState({ sessionPath: undefined, sessionId: undefined, sessionName: undefined });
       setCurrentTab('chat');
+      await refreshSessions();
     } catch (err) {
       console.error(err);
     }
@@ -649,16 +702,24 @@ export const App: React.FC = () => {
             onNewChat={handleNewChat}
             projects={projects}
             currentProject={currentProject}
+            standaloneSessions={standaloneSessions}
+            activeSession={activeSession}
             onSelectProject={(proj) => {
               setCurrentProject(proj);
               saveAppState({ projectPath: proj.path, sessionPath: undefined, sessionId: undefined, sessionName: undefined });
               startPiSession(proj.path, getSavedAppState());
             }}
             onOpenNewProjectFolder={handleOpenNewProjectFolder}
-            onRefreshProjects={loadProjectsAndStart}
+            onRefreshProjects={refreshSessions}
             onLoadExistingSession={handleLoadExistingSession}
             onSelectSession={async (sess) => {
               setActiveSession(sess);
+              if (sess.cwd) {
+                const matchingProj = projects.find(p => p.path.toLowerCase() === sess.cwd!.toLowerCase());
+                if (matchingProj && (!currentProject || currentProject.path.toLowerCase() !== matchingProj.path.toLowerCase())) {
+                  setCurrentProject(matchingProj);
+                }
+              }
               if (sess.model) setSelectedModel(sess.model);
               if (sess.thinkingLevel) setThinkingLevel(sess.thinkingLevel);
               saveAppState({

@@ -30,6 +30,8 @@ interface SidebarProps {
   onNewChat: () => void;
   projects: PiProject[];
   currentProject: PiProject | null;
+  standaloneSessions?: PiSessionSummary[];
+  activeSession?: PiSessionSummary | null;
   onSelectProject: (proj: PiProject) => void;
   onOpenNewProjectFolder: () => void;
   onSelectSession: (session: PiSessionSummary) => void;
@@ -53,6 +55,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onNewChat,
   projects,
   currentProject,
+  standaloneSessions = [],
+  activeSession,
   onSelectProject,
   onOpenNewProjectFolder,
   onSelectSession,
@@ -62,6 +66,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   piVersion = '0.85.1'
 }) => {
   const [expandedProjects, setExpandedProjects] = useState<Record<string, boolean>>({});
+  const [expandStandalone, setExpandStandalone] = useState(true);
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [showLoadSessionModal, setShowLoadSessionModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -97,14 +102,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
     });
   };
 
-  const handleSessionContextMenu = (e: React.MouseEvent, proj: PiProject, sess: PiSessionSummary) => {
+  const handleSessionContextMenu = (e: React.MouseEvent, proj: PiProject | null | undefined, sess: PiSessionSummary) => {
     e.preventDefault();
     e.stopPropagation();
     setContextMenu({
       type: 'session',
       x: e.clientX,
       y: e.clientY,
-      project: proj,
+      project: proj || undefined,
       session: sess
     });
   };
@@ -252,88 +257,258 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Projects & Sessions Section Header */}
       <div className="flex-1 overflow-y-auto px-2 py-3 space-y-3">
-        <div className="flex items-center justify-between px-3 pb-1 text-[11px] font-semibold text-dark-500 uppercase tracking-wider">
-          <span>Projects</span>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowLoadSessionModal(true)}
-              className="text-dark-400 hover:text-purple-300 transition flex items-center gap-1 font-normal capitalize"
-              title="Browse and load existing Pi sessions from ~/.pi/agent/sessions"
-            >
-              <History size={12} />
-              <span>Resume</span>
-            </button>
-            <button
-              onClick={onOpenNewProjectFolder}
-              className="text-dark-400 hover:text-white transition flex items-center gap-1 font-normal capitalize"
-              title="Open folder..."
-            >
-              <FolderPlus size={12} />
-              <span>Open</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Project List */}
-        <div className="space-y-1">
-          {projects.map((proj) => {
-            const isSelected = currentProject?.path === proj.path;
-            const isExpanded = expandedProjects[proj.path] ?? true;
-
-            return (
-              <div key={proj.path} className="space-y-0.5">
-                <div
-                  onClick={() => {
-                    onSelectProject(proj);
-                    onSelectTab('chat');
-                  }}
-                  onContextMenu={(e) => handleProjectContextMenu(e, proj)}
-                  className={`flex items-center justify-between px-2.5 py-1.5 rounded-md cursor-pointer transition group ${isSelected ? 'bg-dark-800/90 text-white font-medium' : 'hover:bg-dark-900 text-dark-300'}`}
-                  title={`${proj.path} (Right-click for options)`}
+        {/* If no projects are open, show Sessions as the primary view */}
+        {projects.length === 0 ? (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between px-2 pb-1 text-[11px] font-semibold text-dark-500 uppercase tracking-wider">
+              <span>Recent Sessions</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowLoadSessionModal(true)}
+                  className="text-dark-400 hover:text-purple-300 transition flex items-center gap-1 font-normal capitalize"
+                  title="Browse all saved Pi sessions from disk"
                 >
-                  <div className="flex items-center gap-2 truncate flex-1">
-                    <button onClick={(e) => toggleProject(proj.path, e)} className="text-dark-400 hover:text-white">
-                      {isExpanded ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
-                    </button>
-                    <Folder size={13} className={isSelected ? 'text-pi-accent' : 'text-dark-500'} />
-                    <span className="truncate font-medium">{proj.name}</span>
-                  </div>
+                  <History size={12} />
+                  <span>Resume</span>
+                </button>
+                <button
+                  onClick={onOpenNewProjectFolder}
+                  className="text-dark-400 hover:text-white transition flex items-center gap-1 font-normal capitalize"
+                  title="Open folder as project..."
+                >
+                  <FolderPlus size={12} />
+                  <span>Open</span>
+                </button>
+              </div>
+            </div>
 
-                  <div className="flex items-center gap-1.5">
-                    {isSelected && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-pi-accent" />
-                    )}
-                    <button
-                      onClick={(e) => handleProjectContextMenu(e, proj)}
-                      className="opacity-0 group-hover:opacity-100 text-dark-400 hover:text-white p-0.5"
+            {/* Sessions List */}
+            <div className="space-y-0.5">
+              {/* Optimistic active session if not yet saved to disk list */}
+              {activeSession && !standaloneSessions.some(s => s.id === activeSession.id || (activeSession.path && s.path === activeSession.path)) && (
+                <div
+                  onClick={() => onSelectTab('chat')}
+                  className="px-2.5 py-1.5 rounded-md cursor-pointer transition flex items-center justify-between bg-dark-800 text-white font-medium border border-dark-750 shadow-xs"
+                  title="Current active session"
+                >
+                  <div className="flex items-center gap-2 truncate flex-1 mr-1">
+                    <MessageSquare size={12} className="text-pi-accent shrink-0" />
+                    <span className="truncate">{activeSession.name || 'New session'}</span>
+                  </div>
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse shrink-0" />
+                </div>
+              )}
+
+              {standaloneSessions.map((sess) => {
+                const isCurrentSession = activeSessionId === sess.id || (activeSession?.path && activeSession.path === sess.path);
+                return (
+                  <div
+                    key={sess.id}
+                    onClick={() => {
+                      onSelectSession(sess);
+                      onSelectTab('chat');
+                    }}
+                    onContextMenu={(e) => handleSessionContextMenu(e, null, sess)}
+                    className={`px-2.5 py-1.5 rounded-md cursor-pointer transition flex items-center justify-between group/sess ${
+                      isCurrentSession ? 'bg-dark-800 text-white font-medium shadow-xs' : 'text-dark-400 hover:text-dark-200 hover:bg-dark-900/60'
+                    }`}
+                    title={`${sess.name} (Right-click for options)`}
+                  >
+                    <div className="flex items-center gap-2 truncate flex-1 mr-1">
+                      <MessageSquare size={12} className={isCurrentSession ? 'text-pi-accent shrink-0' : 'text-dark-500 shrink-0'} />
+                      <span className="truncate">{sess.name}</span>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {isCurrentSession && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
+                      <button
+                        onClick={(e) => handleSessionContextMenu(e, null, sess)}
+                        className="opacity-0 group-hover/sess:opacity-100 text-dark-500 hover:text-white p-0.5"
+                      >
+                        <MoreVertical size={11} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {standaloneSessions.length === 0 && !activeSession && (
+                <div className="px-3 py-4 text-center border border-dashed border-dark-800 rounded-lg bg-dark-950/40 space-y-2">
+                  <MessageSquare size={18} className="mx-auto text-dark-600" />
+                  <div className="text-xs text-dark-300 font-medium">No sessions yet</div>
+                  <p className="text-[11px] text-dark-500 leading-tight">
+                    Click &ldquo;New session&rdquo; above to start chatting or open a project folder.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Compact project open bar */}
+            <div className="pt-2">
+              <button
+                onClick={onOpenNewProjectFolder}
+                className="w-full py-1.5 px-2 bg-dark-900 hover:bg-dark-850 text-dark-400 hover:text-white text-[11px] font-medium rounded border border-dark-800 transition flex items-center justify-center gap-1.5"
+              >
+                <FolderPlus size={12} className="text-pi-accent" />
+                <span>Open Project Folder</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* When projects exist: show projects with nested sessions, plus standalone sessions if any */
+          <div className="space-y-3">
+            <div className="flex items-center justify-between px-3 pb-1 text-[11px] font-semibold text-dark-500 uppercase tracking-wider">
+              <span>Projects</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowLoadSessionModal(true)}
+                  className="text-dark-400 hover:text-purple-300 transition flex items-center gap-1 font-normal capitalize"
+                  title="Browse and load existing Pi sessions from ~/.pi/agent/sessions"
+                >
+                  <History size={12} />
+                  <span>Resume</span>
+                </button>
+                <button
+                  onClick={onOpenNewProjectFolder}
+                  className="text-dark-400 hover:text-white transition flex items-center gap-1 font-normal capitalize"
+                  title="Open folder..."
+                >
+                  <FolderPlus size={12} />
+                  <span>Open</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Project List */}
+            <div className="space-y-1">
+              {projects.map((proj) => {
+                const isSelected = currentProject?.path === proj.path;
+                const isExpanded = expandedProjects[proj.path] ?? true;
+                const projectSessions = proj.sessions || [];
+
+                return (
+                  <div key={proj.path} className="space-y-0.5">
+                    <div
+                      onClick={() => {
+                        onSelectProject(proj);
+                        onSelectTab('chat');
+                      }}
+                      onContextMenu={(e) => handleProjectContextMenu(e, proj)}
+                      className={`flex items-center justify-between px-2.5 py-1.5 rounded-md cursor-pointer transition group ${isSelected ? 'bg-dark-800/90 text-white font-medium' : 'hover:bg-dark-900 text-dark-300'}`}
+                      title={`${proj.path} (Right-click for options)`}
                     >
-                      <MoreVertical size={12} />
-                    </button>
+                      <div className="flex items-center gap-2 truncate flex-1">
+                        <button onClick={(e) => toggleProject(proj.path, e)} className="text-dark-400 hover:text-white">
+                          {isExpanded ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
+                        </button>
+                        <Folder size={13} className={isSelected ? 'text-pi-accent' : 'text-dark-500'} />
+                        <span className="truncate font-medium">{proj.name}</span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        {isSelected && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-pi-accent" />
+                        )}
+                        <button
+                          onClick={(e) => handleProjectContextMenu(e, proj)}
+                          className="opacity-0 group-hover:opacity-100 text-dark-400 hover:text-white p-0.5"
+                        >
+                          <MoreVertical size={12} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Sessions under this project */}
+                    {isExpanded && (
+                      <div className="pl-6 space-y-0.5">
+                        {/* Optimistic active session under this project if not yet written to disk */}
+                        {isSelected && activeSession && !projectSessions.some(s => s.id === activeSession.id || (activeSession.path && s.path === activeSession.path)) && (
+                          <div
+                            onClick={() => onSelectTab('chat')}
+                            className="px-2 py-1 rounded text-[11px] font-medium bg-dark-800 text-white flex items-center justify-between cursor-pointer"
+                          >
+                            <span className="truncate">{activeSession.name || 'New session'}</span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse shrink-0" />
+                          </div>
+                        )}
+
+                        {projectSessions.map((sess) => {
+                          const isCurrentSession = activeSessionId === sess.id || (activeSession?.path && activeSession.path === sess.path);
+                          return (
+                            <div
+                              key={sess.id}
+                              onClick={() => {
+                                onSelectProject(proj);
+                                onSelectSession(sess);
+                                onSelectTab('chat');
+                              }}
+                              onContextMenu={(e) => handleSessionContextMenu(e, proj, sess)}
+                              className={`px-2 py-1 rounded text-[11px] cursor-pointer truncate transition flex items-center justify-between group/sess ${isCurrentSession ? 'bg-dark-800 text-white font-medium' : 'text-dark-400 hover:text-dark-200 hover:bg-dark-900/60'}`}
+                              title={`${sess.name} (Right-click for options)`}
+                            >
+                              <span className="truncate">{sess.name}</span>
+                              <div className="flex items-center gap-1 shrink-0">
+                                {isCurrentSession && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
+                                <button
+                                  onClick={(e) => handleSessionContextMenu(e, proj, sess)}
+                                  className="opacity-0 group-hover/sess:opacity-100 text-dark-500 hover:text-white p-0.5"
+                                >
+                                  <MoreVertical size={11} />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {projectSessions.length === 0 && (!isSelected || !activeSession) && (
+                          <div className="py-1 text-[10px] text-dark-500 italic">
+                            No sessions in project
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Other Standalone / Recent Sessions (outside projects) */}
+            {standaloneSessions.length > 0 && (
+              <div className="pt-2 border-t border-dark-800/80">
+                <div
+                  onClick={() => setExpandStandalone(!expandStandalone)}
+                  className="flex items-center justify-between px-2 py-1 text-[11px] font-semibold text-dark-500 uppercase tracking-wider cursor-pointer hover:text-dark-400 transition"
+                >
+                  <div className="flex items-center gap-1.5">
+                    {expandStandalone ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                    <span>Other Sessions ({standaloneSessions.length})</span>
                   </div>
                 </div>
 
-                {/* Real Sessions under project */}
-                {isExpanded && proj.sessions && proj.sessions.length > 0 && (
-                  <div className="pl-6 space-y-0.5">
-                    {proj.sessions.map((sess) => {
-                      const isCurrentSession = activeSessionId === sess.id;
+                {expandStandalone && (
+                  <div className="space-y-0.5 mt-1">
+                    {standaloneSessions.map((sess) => {
+                      const isCurrentSession = activeSessionId === sess.id || (activeSession?.path && activeSession.path === sess.path);
                       return (
                         <div
                           key={sess.id}
                           onClick={() => {
-                            onSelectProject(proj);
                             onSelectSession(sess);
                             onSelectTab('chat');
                           }}
-                          onContextMenu={(e) => handleSessionContextMenu(e, proj, sess)}
-                          className={`px-2 py-1 rounded text-[11px] cursor-pointer truncate transition flex items-center justify-between group/sess ${isCurrentSession ? 'bg-dark-800 text-white font-medium' : 'text-dark-400 hover:text-dark-200 hover:bg-dark-900/60'}`}
+                          onContextMenu={(e) => handleSessionContextMenu(e, null, sess)}
+                          className={`px-2.5 py-1.5 rounded-md cursor-pointer transition flex items-center justify-between group/sess ${
+                            isCurrentSession ? 'bg-dark-800 text-white font-medium shadow-xs' : 'text-dark-400 hover:text-dark-200 hover:bg-dark-900/60'
+                          }`}
                           title={`${sess.name} (Right-click for options)`}
                         >
-                          <span className="truncate">{sess.name}</span>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-2 truncate flex-1 mr-1">
+                            <MessageSquare size={12} className={isCurrentSession ? 'text-pi-accent shrink-0' : 'text-dark-500 shrink-0'} />
+                            <span className="truncate">{sess.name}</span>
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
                             {isCurrentSession && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
                             <button
-                              onClick={(e) => handleSessionContextMenu(e, proj, sess)}
+                              onClick={(e) => handleSessionContextMenu(e, null, sess)}
                               className="opacity-0 group-hover/sess:opacity-100 text-dark-500 hover:text-white p-0.5"
                             >
                               <MoreVertical size={11} />
@@ -345,36 +520,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </div>
                 )}
               </div>
-            );
-          })}
-
-          {/* Empty state: by default projects are empty */}
-          {projects.length === 0 && (
-            <div className="px-3 py-4 text-center border border-dashed border-dark-800 rounded-lg bg-dark-950/40 space-y-2">
-              <Folder size={20} className="mx-auto text-dark-600" />
-              <div className="text-xs text-dark-300 font-medium">No projects open</div>
-              <p className="text-[11px] text-dark-500 leading-tight">
-                Open a project folder or load a past session to start coding.
-              </p>
-              <div className="space-y-1.5 pt-1">
-                <button
-                  onClick={onOpenNewProjectFolder}
-                  className="w-full py-1.5 px-2 bg-dark-800 hover:bg-dark-750 text-white text-[11px] font-medium rounded border border-dark-700 transition flex items-center justify-center gap-1.5"
-                >
-                  <FolderPlus size={12} className="text-pi-accent" />
-                  <span>Open Project Folder</span>
-                </button>
-                <button
-                  onClick={() => setShowLoadSessionModal(true)}
-                  className="w-full py-1.5 px-2 bg-dark-900 hover:bg-dark-850 text-dark-300 hover:text-purple-300 text-[11px] font-medium rounded border border-dark-800 transition flex items-center justify-center gap-1.5"
-                >
-                  <History size={12} className="text-purple-400" />
-                  <span>Load Past Pi Session</span>
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Right-click Context Menu */}
