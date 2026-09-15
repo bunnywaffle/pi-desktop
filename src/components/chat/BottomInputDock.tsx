@@ -246,23 +246,37 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
     }
   }, [showModelPicker, showThinkingPicker]);
 
-  // Query Pi RPC commands dynamically and merge with builtins
-  useEffect(() => {
-    let isMounted = true;
-    const fetchCommands = async () => {
-      try {
-        const res = await (window as any).electronAPI?.getCommands?.();
-        if (isMounted && res) {
-          const rawList = Array.isArray(res) ? res : (res.commands || []);
-          setAvailableCommands(mergeSlashCommands(rawList));
-        }
-      } catch (err) {
-        console.warn('Slash commands query error:', err);
+  const fetchCommands = async () => {
+    try {
+      const res = await (window as any).electronAPI?.getCommands?.();
+      if (res) {
+        const rawList = Array.isArray(res) ? res : (res.commands || []);
+        setAvailableCommands(mergeSlashCommands(rawList));
       }
-    };
+    } catch (err) {
+      console.warn('Slash commands query error:', err);
+    }
+  };
+
+  // Query Pi RPC commands dynamically on mount and when project workspace changes
+  useEffect(() => {
     fetchCommands();
-    return () => { isMounted = false; };
-  }, []);
+
+    const handleRefresh = () => fetchCommands();
+    window.addEventListener('pi:refresh-commands', handleRefresh);
+    return () => window.removeEventListener('pi:refresh-commands', handleRefresh);
+  }, [projectName]);
+
+  // When user types '/', immediately trigger a live background refresh from Pi RPC
+  const handleTextChange = (val: string) => {
+    setText(val);
+    setSlashPopupDismissed(false);
+    setSelectedSlashIndex(0);
+
+    if (val.startsWith('/') && !val.includes(' ')) {
+      fetchCommands();
+    }
+  };
 
   // Determine if slash autocomplete should be active
   const isSlashQuery = text.startsWith('/') && !text.includes(' ') && !slashPopupDismissed;
@@ -296,12 +310,6 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
         onSendMessage(fullCmd, 'prompt');
       }
     }
-  };
-
-  const handleTextChange = (val: string) => {
-    setText(val);
-    setSlashPopupDismissed(false);
-    setSelectedSlashIndex(0);
   };
 
   useEffect(() => {
