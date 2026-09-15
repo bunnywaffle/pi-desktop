@@ -405,9 +405,24 @@ export const App: React.FC = () => {
         break;
 
       case 'turn_end':
-        if (evt.message) {
-          setMessages(prev => [...prev, evt.message]);
-        }
+        setMessages(prev => {
+          const next = [...prev];
+          if (evt.message) next.push(evt.message);
+          if (evt.toolResults && Array.isArray(evt.toolResults)) {
+            for (const tr of evt.toolResults) {
+              next.push({
+                role: 'toolResult',
+                toolCallId: tr.toolCallId,
+                toolName: tr.toolName,
+                content: tr.content,
+                isError: tr.isError,
+                details: tr.details,
+                timestamp: Date.now()
+              });
+            }
+          }
+          return next;
+        });
         setStreamingText('');
         setStreamingThinking('');
         setStreamingToolCalls([]);

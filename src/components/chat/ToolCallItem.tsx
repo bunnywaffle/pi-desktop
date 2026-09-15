@@ -37,14 +37,23 @@ export const ToolCallItem: React.FC<ToolCallItemProps> = ({ toolCall, result, is
     if (args.path) return args.path;
     if (args.filePath) return args.filePath;
     if (args.pattern) return `pattern: ${args.pattern}`;
-    return JSON.stringify(args).slice(0, 50);
+    if (args.query) return `query: ${args.query}`;
+    if (args.url) return args.url;
+    const str = JSON.stringify(args);
+    return str === '{}' ? '' : str.slice(0, 60);
   };
 
-  const getOutputText = () => {
+  const getOutputText = (): string => {
     if (!result) return '';
     if (typeof result === 'string') return result;
-    if (result.content && Array.isArray(result.content)) {
-      return result.content.map((c: any) => c.text || '').join('\n');
+    if (Array.isArray(result)) {
+      return result.map((c: any) => typeof c === 'string' ? c : (c.text || JSON.stringify(c))).join('\n');
+    }
+    if (result.content) {
+      if (typeof result.content === 'string') return result.content;
+      if (Array.isArray(result.content)) {
+        return result.content.map((c: any) => typeof c === 'string' ? c : (c.text || JSON.stringify(c))).join('\n');
+      }
     }
     return JSON.stringify(result, null, 2);
   };

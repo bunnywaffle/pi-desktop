@@ -219,11 +219,15 @@ export class SessionManager {
           const obj = JSON.parse(line);
           if (obj.type === 'message' && obj.message) {
             messages.push({
-              id: obj.id,
+              id: obj.id || obj.message.id,
               role: obj.message.role,
               content: obj.message.content,
               model: obj.message.model,
               errorMessage: obj.message.errorMessage,
+              toolCallId: obj.message.toolCallId,
+              toolName: obj.message.toolName,
+              isError: obj.message.isError,
+              details: obj.message.details,
               timestamp: obj.timestamp ? new Date(obj.timestamp).getTime() : Date.now()
             });
           }
