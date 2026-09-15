@@ -10,7 +10,9 @@ import {
   Search,
   Check
 } from 'lucide-react';
-import { PiModel } from '../../types/pi';
+import { PiModel, PiSlashCommand } from '../../types/pi';
+import { BUILTIN_SLASH_COMMANDS, mergeSlashCommands, filterSlashCommands } from '../../utils/slashCommands';
+import { SlashCommandPopup } from './SlashCommandPopup';
 
 interface BottomInputDockProps {
   projectName: string;
@@ -153,6 +155,9 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
   const [modelSearchQuery, setModelSearchQuery] = useState('');
   const [selectedProviderFilter, setSelectedProviderFilter] = useState('all');
   const [streamingQueueMode, setStreamingQueueMode] = useState<'steer' | 'followUp'>('steer');
+  const [availableCommands, setAvailableCommands] = useState<PiSlashCommand[]>(BUILTIN_SLASH_COMMANDS);
+  const [selectedSlashIndex, setSelectedSlashIndex] = useState(0);
+  const [slashPopupDismissed, setSlashPopupDismissed] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
 
@@ -241,6 +246,64 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
     }
   }, [showModelPicker, showThinkingPicker]);
 
+  // Query Pi RPC commands dynamically and merge with builtins
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCommands = async () => {
+      try {
+        const res = await (window as any).electronAPI?.getCommands?.();
+        if (isMounted && res) {
+          const rawList = Array.isArray(res) ? res : (res.commands || []);
+          setAvailableCommands(mergeSlashCommands(rawList));
+        }
+      } catch (err) {
+        console.warn('Slash commands query error:', err);
+      }
+    };
+    fetchCommands();
+    return () => { isMounted = false; };
+  }, []);
+
+  // Determine if slash autocomplete should be active
+  const isSlashQuery = text.startsWith('/') && !text.includes(' ') && !slashPopupDismissed;
+  const filteredSlashCommands = useMemo(() => {
+    if (!isSlashQuery) return [];
+    return filterSlashCommands(text, availableCommands);
+  }, [isSlashQuery, text, availableCommands]);
+
+  const showSlashPopup = isSlashQuery && filteredSlashCommands.length > 0;
+
+  useEffect(() => {
+    if (selectedSlashIndex >= filteredSlashCommands.length) {
+      setSelectedSlashIndex(0);
+    }
+  }, [filteredSlashCommands.length, selectedSlashIndex]);
+
+  const handleSelectSlashCommand = (cmd: PiSlashCommand) => {
+    if (cmd.argumentHint) {
+      setText(`/${cmd.name} `);
+      setSlashPopupDismissed(true);
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 30);
+    } else {
+      const fullCmd = `/${cmd.name}`;
+      setText('');
+      setSlashPopupDismissed(true);
+      if (isStreaming) {
+        onSendMessage(fullCmd, streamingQueueMode);
+      } else {
+        onSendMessage(fullCmd, 'prompt');
+      }
+    }
+  };
+
+  const handleTextChange = (val: string) => {
+    setText(val);
+    setSlashPopupDismissed(false);
+    setSelectedSlashIndex(0);
+  };
+
   useEffect(() => {
     if (prefilledText !== undefined && prefilledText !== null) {
       setText(prefilledText);
@@ -254,6 +317,32 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
   }, [prefilledText]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (showSlashPopup) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedSlashIndex(prev => (prev + 1) % filteredSlashCommands.length);
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedSlashIndex(prev => (prev - 1 + filteredSlashCommands.length) % filteredSlashCommands.length);
+        return;
+      }
+      if (e.key === 'Tab' || (e.key === 'Enter' && !e.shiftKey)) {
+        e.preventDefault();
+        const targetCmd = filteredSlashCommands[selectedSlashIndex];
+        if (targetCmd) {
+          handleSelectSlashCommand(targetCmd);
+          return;
+        }
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setSlashPopupDismissed(true);
+        return;
+      }
+    }
+
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
@@ -273,10 +362,20 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 pb-4">
+    <div className="w-full max-w-3xl mx-auto px-4 pb-4 relative">
+      {/* Floating slash command autocomplete popup */}
+      {showSlashPopup && (
+        <SlashCommandPopup
+          commands={filteredSlashCommands}
+          selectedIndex={selectedSlashIndex}
+          onSelectCommand={handleSelectSlashCommand}
+          onClose={() => setSlashPopupDismissed(true)}
+        />
+      )}
+
       <div
         onClick={() => textareaRef.current?.focus()}
-        className="bg-dark-900 border border-dark-800 rounded-2xl shadow-xl p-2.5 transition-all focus-within:border-dark-700 cursor-text"
+        className="bg-dark-900 border border-dark-800 rounded-2xl shadow-xl p-2.5 transition-all focus-within:border-dark-700 cursor-text relative"
       >
         {/* Top dock info pills */}
         <div className="flex items-center gap-2 mb-2 px-1 text-[11px] text-dark-400 font-medium" onClick={(e) => e.stopPropagation()}>
@@ -303,7 +402,7 @@ export const BottomInputDock: React.FC<BottomInputDockProps> = ({
         <textarea
           ref={textareaRef}
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => handleTextChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Ask Pi or give instructions (Enter to send, Shift+Enter for new line)..."
           rows={2}

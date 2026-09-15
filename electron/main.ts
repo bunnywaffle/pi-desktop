@@ -193,6 +193,8 @@ function setupIpc() {
   ipcMain.handle('pi:compact', async (_, instructions) => piRpc.compact(instructions));
   ipcMain.handle('pi:get-session-stats', async () => piRpc.getSessionStats());
   ipcMain.handle('pi:get-commands', async () => piRpc.getCommands());
+  ipcMain.handle('pi:set-session-name', async (_, name: string) => piRpc.setSessionName(name));
+  ipcMain.handle('pi:execute-bash', async (_, command: string) => piRpc.executeBash(command));
 
   // Dialog Bridge
   ipcMain.handle('pi:resolve-ui-dialog', async (_, response) => {

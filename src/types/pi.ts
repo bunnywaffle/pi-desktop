@@ -236,3 +236,10 @@ export interface CustomProviderConfig {
   }>;
 }
 
+export interface PiSlashCommand {
+  name: string;
+  description?: string;
+  argumentHint?: string;
+  source: 'builtin' | 'extension' | 'prompt' | 'skill';
+  category?: string;
+}

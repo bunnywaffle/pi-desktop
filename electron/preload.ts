@@ -40,6 +40,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   compact: (instructions?: string) => ipcRenderer.invoke('pi:compact', instructions),
   getSessionStats: () => ipcRenderer.invoke('pi:get-session-stats'),
   getCommands: () => ipcRenderer.invoke('pi:get-commands'),
+  setSessionName: (name: string) => ipcRenderer.invoke('pi:set-session-name', name),
+  executeBash: (command: string) => ipcRenderer.invoke('pi:execute-bash', command),
 
   // UI Bridge Dialog Interception
   resolveUiDialog: (res: ExtensionUiResponse) => ipcRenderer.invoke('pi:resolve-ui-dialog', res),

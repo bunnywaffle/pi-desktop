@@ -21,8 +21,10 @@ import {
   PiStats,
   ToolCall,
   ExtensionUiRequest,
-  ExtensionUiResponse
+  ExtensionUiResponse,
+  PiSlashCommand
 } from './types/pi';
+import { generateHelpMarkdown, mergeSlashCommands, BUILTIN_SLASH_COMMANDS } from './utils/slashCommands';
 
 interface SavedAppState {
   modelId?: string;
@@ -487,6 +489,322 @@ export const App: React.FC = () => {
       return;
     }
 
+    const trimmed = text.trim();
+
+    // Intercept built-in desktop slash commands
+    if (trimmed.startsWith('/')) {
+      const match = trimmed.slice(1).match(/^([^\s]+)(?:\s+(.*))?$/s);
+      if (match) {
+        const cmdName = match[1].toLowerCase();
+        const cmdArgs = (match[2] || '').trim();
+
+        // 1. /help or /?
+        if (cmdName === 'help' || cmdName === '?') {
+          const userMsg: PiMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+          let dynamicList: PiSlashCommand[] = BUILTIN_SLASH_COMMANDS;
+          try {
+            const res = await (window as any).electronAPI?.getCommands?.();
+            if (res) {
+              const raw = Array.isArray(res) ? res : (res.commands || []);
+              dynamicList = mergeSlashCommands(raw);
+            }
+          } catch {}
+
+          const helpContent = generateHelpMarkdown(dynamicList);
+          const assistantMsg: PiMessage = {
+            role: 'assistant',
+            content: helpContent,
+            timestamp: Date.now()
+          };
+          setMessages(prev => [...prev, userMsg, assistantMsg]);
+          return;
+        }
+
+        // 2. /compact [instructions]
+        if (cmdName === 'compact') {
+          const userMsg: PiMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+          setMessages(prev => [...prev, userMsg]);
+          setIsStreaming(true);
+          const toastId = 'compact_' + Date.now();
+          setToasts(prev => [...prev, { id: toastId, message: 'Compacting session context...', type: 'info' }]);
+
+          try {
+            const res = await (window as any).electronAPI.compact(cmdArgs || undefined);
+            setIsStreaming(false);
+            setToasts(prev => prev.filter(t => t.id !== toastId));
+
+            const summary = res?.summary || 'Context compaction completed successfully.';
+            const tokensBefore = res?.tokensBefore ? `\n> Tokens before: ${res.tokensBefore.toLocaleString()}` : '';
+            const assistantMsg: PiMessage = {
+              role: 'assistant',
+              content: `### ⚡ Context Compacted\n\n${summary}${tokensBefore}`,
+              timestamp: Date.now()
+            };
+            setMessages(prev => [...prev, assistantMsg]);
+            (window as any).electronAPI?.getSessionStats?.().then((s: any) => {
+              if (s) setSessionStats(s);
+            }).catch(() => {});
+          } catch (err: any) {
+            setIsStreaming(false);
+            setToasts(prev => prev.filter(t => t.id !== toastId));
+            setMessages(prev => [...prev, {
+              role: 'assistant',
+              content: '',
+              errorMessage: `Compaction failed: ${err.message || String(err)}`,
+              timestamp: Date.now()
+            }]);
+          }
+          return;
+        }
+
+        // 3. /new or /clear
+        if (cmdName === 'new' || cmdName === 'clear') {
+          const toastId = 'new_' + Date.now();
+          setToasts(prev => [...prev, { id: toastId, message: 'Starting new session...', type: 'info' }]);
+          setTimeout(() => setToasts(prev => prev.filter(t => t.id !== toastId)), 3000);
+          await handleNewChat();
+          return;
+        }
+
+        // 4. /session or /stats
+        if (cmdName === 'session' || cmdName === 'stats') {
+          const userMsg: PiMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+          setMessages(prev => [...prev, userMsg]);
+          try {
+            const [stats, state] = await Promise.all([
+              (window as any).electronAPI.getSessionStats().catch(() => null),
+              (window as any).electronAPI.getState().catch(() => null)
+            ]);
+
+            const currentModelName = state?.model?.name || state?.model?.id || selectedModel || 'Default';
+            const currentProvider = state?.model?.provider || 'Native';
+            const curThinking = state?.thinkingLevel || thinkingLevel || 'off';
+
+            let statsMd = `### 📊 Session Statistics\n\n`;
+            statsMd += `- **Model**: \`${currentModelName}\` (${currentProvider})\n`;
+            statsMd += `- **Reasoning Effort**: \`${curThinking}\`\n`;
+            if (stats) {
+              statsMd += `- **Messages**: ${stats.totalMessages || 0} (${stats.userMessages || 0} user, ${stats.assistantMessages || 0} assistant)\n`;
+              statsMd += `- **Tool Calls**: ${stats.toolCalls || 0}\n`;
+              if (stats.tokens) {
+                statsMd += `- **Tokens In**: ${stats.tokens.input?.toLocaleString() || 0}\n`;
+                statsMd += `- **Tokens Out**: ${stats.tokens.output?.toLocaleString() || 0}\n`;
+                statsMd += `- **Cache Read**: ${stats.tokens.cacheRead?.toLocaleString() || 0}\n`;
+                statsMd += `- **Cache Write**: ${stats.tokens.cacheWrite?.toLocaleString() || 0}\n`;
+                statsMd += `- **Total Tokens**: ${stats.tokens.total?.toLocaleString() || 0}\n`;
+              }
+              if (stats.cost !== undefined) {
+                statsMd += `- **Estimated Cost**: \`$${Number(stats.cost).toFixed(4)}\`\n`;
+              }
+              if (stats.contextUsage) {
+                statsMd += `- **Context Usage**: ${stats.contextUsage.tokens?.toLocaleString() || 0} / ${stats.contextUsage.contextWindow?.toLocaleString() || 0} (${stats.contextUsage.percent || 0}%)\n`;
+              }
+            }
+            if (activeSession?.path) {
+              statsMd += `- **Session File**: \`${activeSession.path}\`\n`;
+            }
+
+            const assistantMsg: PiMessage = {
+              role: 'assistant',
+              content: statsMd,
+              timestamp: Date.now()
+            };
+            setMessages(prev => [...prev, assistantMsg]);
+          } catch (err: any) {
+            setMessages(prev => [...prev, {
+              role: 'assistant',
+              content: '',
+              errorMessage: `Failed to retrieve stats: ${err.message}`,
+              timestamp: Date.now()
+            }]);
+          }
+          return;
+        }
+
+        // 5. /model [arg]
+        if (cmdName === 'model') {
+          const userMsg: PiMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+          if (cmdArgs) {
+            handleSelectModel(cmdArgs);
+            const assistantMsg: PiMessage = {
+              role: 'assistant',
+              content: `Switched active model to **\`${cmdArgs}\`**.`,
+              timestamp: Date.now()
+            };
+            setMessages(prev => [...prev, userMsg, assistantMsg]);
+          } else {
+            const assistantMsg: PiMessage = {
+              role: 'assistant',
+              content: `Current model: **\`${selectedModel}\`**.\n\nUse \`/model <provider/modelId>\` or click the model selector button in the bottom dock.`,
+              timestamp: Date.now()
+            };
+            setMessages(prev => [...prev, userMsg, assistantMsg]);
+          }
+          return;
+        }
+
+        // 6. /models
+        if (cmdName === 'models') {
+          const userMsg: PiMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+          const modelList = models
+            .map(m => `- **\`${m.id}\`** (${m.provider || 'unknown'})${m.supportsThinking ? ' 🧠 *thinking*' : ''}`)
+            .slice(0, 30)
+            .join('\n');
+          const assistantMsg: PiMessage = {
+            role: 'assistant',
+            content: `### 🤖 Available Models (${models.length})\n\n${modelList}${models.length > 30 ? `\n\n*...and ${models.length - 30} more. Use the bottom input dock selector to search.*` : ''}`,
+            timestamp: Date.now()
+          };
+          setMessages(prev => [...prev, userMsg, assistantMsg]);
+          return;
+        }
+
+        // 7. /thinking [level]
+        if (cmdName === 'thinking') {
+          const userMsg: PiMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+          const validLevels = ['off', 'minimal', 'low', 'medium', 'high', 'extreme'];
+          if (cmdArgs && validLevels.includes(cmdArgs.toLowerCase())) {
+            handleSelectThinkingLevel(cmdArgs.toLowerCase());
+            const assistantMsg: PiMessage = {
+              role: 'assistant',
+              content: `Reasoning effort level updated to **\`${cmdArgs.toLowerCase()}\`**.`,
+              timestamp: Date.now()
+            };
+            setMessages(prev => [...prev, userMsg, assistantMsg]);
+          } else {
+            const assistantMsg: PiMessage = {
+              role: 'assistant',
+              content: `Current reasoning effort: **\`${thinkingLevel}\`**.\n\nUsage: \`/thinking <off | minimal | low | medium | high>\``,
+              timestamp: Date.now()
+            };
+            setMessages(prev => [...prev, userMsg, assistantMsg]);
+          }
+          return;
+        }
+
+        // 8. /name <title>
+        if (cmdName === 'name') {
+          const userMsg: PiMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+          if (cmdArgs) {
+            try {
+              await (window as any).electronAPI.setSessionName(cmdArgs);
+            } catch {}
+            setActiveSession(prev => prev ? { ...prev, name: cmdArgs } : null);
+            saveAppState({ sessionName: cmdArgs });
+            await refreshSessions();
+            const assistantMsg: PiMessage = {
+              role: 'assistant',
+              content: `Session title renamed to: **"${cmdArgs}"**`,
+              timestamp: Date.now()
+            };
+            setMessages(prev => [...prev, userMsg, assistantMsg]);
+          } else {
+            const assistantMsg: PiMessage = {
+              role: 'assistant',
+              content: `Usage: \`/name <New Session Title>\``,
+              timestamp: Date.now()
+            };
+            setMessages(prev => [...prev, userMsg, assistantMsg]);
+          }
+          return;
+        }
+
+        // 9. /export
+        if (cmdName === 'export') {
+          const userMsg: PiMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+          setMessages(prev => [...prev, userMsg]);
+          try {
+            if (activeSession?.path) {
+              const homeDir = await (window as any).electronAPI.getHomeDir?.();
+              const target = `${homeDir}\\Downloads\\pi-session-${Date.now()}.${cmdArgs === 'json' ? 'json' : 'html'}`;
+              const res = await (window as any).electronAPI.exportSession(activeSession.path, target);
+              if (res?.success) {
+                const assistantMsg: PiMessage = {
+                  role: 'assistant',
+                  content: `Session exported successfully to:\n\`${target}\``,
+                  timestamp: Date.now()
+                };
+                setMessages(prev => [...prev, assistantMsg]);
+              } else {
+                throw new Error(res?.error || 'Export failed');
+              }
+            } else {
+              const exportData = cmdArgs === 'json'
+                ? JSON.stringify(messages, null, 2)
+                : messages.map(m => `### ${(m.role || 'USER').toUpperCase()}\n${typeof m.content === 'string' ? m.content : JSON.stringify(m.content)}`).join('\n\n');
+              const blob = new Blob([exportData], { type: cmdArgs === 'json' ? 'application/json' : 'text/markdown' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `pi-session-${Date.now()}.${cmdArgs === 'json' ? 'json' : 'md'}`;
+              a.click();
+              URL.revokeObjectURL(url);
+              const assistantMsg: PiMessage = {
+                role: 'assistant',
+                content: `Session exported as \`${cmdArgs === 'json' ? 'JSON' : 'Markdown'}\` to your downloads.`,
+                timestamp: Date.now()
+              };
+              setMessages(prev => [...prev, assistantMsg]);
+            }
+          } catch (err: any) {
+            setMessages(prev => [...prev, {
+              role: 'assistant',
+              content: '',
+              errorMessage: `Export failed: ${err.message || String(err)}`,
+              timestamp: Date.now()
+            }]);
+          }
+          return;
+        }
+
+        // 10. Navigation tabs: /settings, /skills, /prompts, /packages, /themes
+        if (['settings', 'skills', 'prompts', 'packages', 'themes'].includes(cmdName)) {
+          setCurrentTab(cmdName as any);
+          const toastId = 'tab_' + Date.now();
+          setToasts(prev => [...prev, { id: toastId, message: `Navigated to ${cmdName}`, type: 'info' }]);
+          setTimeout(() => setToasts(prev => prev.filter(t => t.id !== toastId)), 3000);
+          return;
+        }
+
+        // 11. /abort
+        if (cmdName === 'abort') {
+          await handleAbort();
+          return;
+        }
+      }
+    }
+
+    // Intercept bash commands (!command or !!command)
+    if (trimmed.startsWith('!')) {
+      const userMsg: PiMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+      setMessages(prev => [...prev, userMsg]);
+      setIsStreaming(true);
+      const isSilent = trimmed.startsWith('!!');
+      const bashCmd = isSilent ? trimmed.slice(2).trim() : trimmed.slice(1).trim();
+
+      try {
+        const res = await (window as any).electronAPI.executeBash(bashCmd);
+        setIsStreaming(false);
+        const output = res?.stdout || res?.output || res?.stderr || '(No output)';
+        const assistantMsg: PiMessage = {
+          role: 'assistant',
+          content: `\`\`\`bash\n$ ${bashCmd}\n${output}\n\`\`\``,
+          timestamp: Date.now()
+        };
+        setMessages(prev => [...prev, assistantMsg]);
+      } catch (err: any) {
+        setIsStreaming(false);
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: '',
+          errorMessage: `Command execution failed: ${err.message || String(err)}`,
+          timestamp: Date.now()
+        }]);
+      }
+      return;
+    }
+
+    // Normal prompt or extension / skill command: send to Pi RPC prompt
     const userMsg: PiMessage = {
       role: 'user',
       content: text,
